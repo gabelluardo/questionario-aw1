@@ -1,5 +1,6 @@
 # Exam #1234: "Exam Title"
-## Student: s123456 LASTNAME FIRSTNAME 
+
+## Student: s290270 Belluardo Gabriele
 
 ## React Client Application Routes
 
@@ -22,9 +23,14 @@
 
 ## Database Tables
 
+<!--
 - Table `users` - contains xx yy zz
 - Table `something` - contains ww qq ss
 - ...
+-->
+
+- Table `users` - contains `id` `email` `username` `hash`
+
 
 ## Main React Components
 
@@ -40,5 +46,12 @@
 
 ## Users Credentials
 
+<!--
 - username, password (plus any other requested info)
 - username, password (plus any other requested info)
+-->
+
+- admin1, passadmin1
+- admin2, passadmin2
+- user1, _no password_
+- user2, _no password_

@@ -12,10 +12,10 @@ function Sidebar(props) {
             Dashboard
           </ListGroup.Item>
           <ListGroup.Item as={Link} to="/important" action>
-            Important
+            Drafts
           </ListGroup.Item>
           <ListGroup.Item as={Link} to="/today" action>
-            Today
+            Results
           </ListGroup.Item>
         </ListGroup>
       </Col>

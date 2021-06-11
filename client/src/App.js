@@ -7,6 +7,11 @@ import { Navbar, Sidebar, View, Login } from "./components";
 
 function App() {
   const [show, setShow] = useState(false);
+  const [user, setUser] = useState({
+    id: 1,
+    username: "admin1",
+    email: "admin1@polito.it",
+  });
 
   const createSurvey = () => {
     console.log("create survey");
@@ -16,10 +21,17 @@ function App() {
     <Router>
       <Container fluid>
         <Row className="vheight-100">
-          <Navbar toggle={() => setShow(!show)} />
+          <Navbar user={user} toggle={() => setShow(!show)} />
           <Sidebar show={show} />
           <Switch>
-            <Route path="/login" render={(props) => <Login {...props} />} />
+            <Route
+              path="/login"
+              render={(props) => (
+                <Login {...props} login={(c) => console.log(c)} />
+              )}
+            />
+
+            {/* <Route path="/survey" render={(props) => <Survey {...props} />} /> */}
 
             <Route
               path="/"

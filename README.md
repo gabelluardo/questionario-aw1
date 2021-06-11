@@ -31,7 +31,6 @@
 
 - Table `users` - contains `id` `email` `username` `hash`
 
-
 ## Main React Components
 
 - `ListOfSomething` (in `List.js`): component purpose and main functionality
@@ -53,5 +52,3 @@
 
 - admin1, passadmin1
 - admin2, passadmin2
-- user1, _no password_
-- user2, _no password_

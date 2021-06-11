@@ -40,9 +40,10 @@
   background-color: #f5f7fb;
 }
 
-/* .view-title { */
-/* background-color: burlywood; */
-/* } */
+/* .view-title {
+  background-color: burlywood;
+}*/
+
 
 /* Profile settings */
 .profile-settings {
@@ -53,8 +54,16 @@
   z-index: 1;
 }
 
-/* Bootstrap custom */
+.profile-pic:hover {
+  cursor: pointer
+}
 
+/* Login */
+.login-form {
+  min-width: 450px;
+}
+
+/* Bootstrap custom */
 /* Button color */
 .btn-green {
   background-color: var(--beau-blue);

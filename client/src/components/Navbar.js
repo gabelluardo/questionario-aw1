@@ -23,13 +23,15 @@ function Navbar(props) {
       </BNavbar.Brand>
 
       <BNavbar.Brand className="my-auto ml-auto">
-        <Icon.PersonSquare size={32} onClick={() => setShow(!show)} />
+        <Icon.PersonSquare
+          className="profile-pic"
+          size={32}
+          onClick={() => setShow(!show)}
+        />
         <Profile
           show={show}
           setShow={setShow}
-          // TODO update user props
-          username="admin"
-          email="admin@polito.it"
+          user={props.user}
           isLogged={false}
         />
       </BNavbar.Brand>
@@ -46,9 +48,11 @@ function Profile(props) {
       <Card.Header as="h6">
         <Card.Title>
           <Icon.PersonCircle size={24} />
-          <span className="ml-2">{props.username}</span>
+          <span className="ml-2">{props.user?.username || "No user"}</span>
         </Card.Title>
-        <Card.Subtitle className="text-muted">{props.email}</Card.Subtitle>
+        <Card.Subtitle className="text-muted">
+          {props.user?.email || ""}
+        </Card.Subtitle>
       </Card.Header>
       <ListGroup variant="flush" onClick={() => props.setShow(false)}>
         <ListGroup.Item

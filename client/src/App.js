@@ -1,50 +1,73 @@
 import { useState } from "react";
 
-import { Container, Row } from "react-bootstrap";
+import { Container } from "react-bootstrap";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import { Navbar, Sidebar, View, Login } from "./components";
+import { Navbar, Dashboard, Login, Survey } from "./components";
+
+// TODO delete example
+const surveyListExample = [
+  {
+    title: "Prova questionario 1",
+    id: 1,
+    response: 25,
+  },
+  {
+    title: "Prova questionario 2",
+    id: 2,
+    response: 15,
+  },
+  {
+    title: "Prova questionario 3",
+    id: 3,
+    response: 6,
+  },
+];
+const userExample = {
+  id: 1,
+  username: "admin1",
+  email: "admin1@polito.it",
+};
 
 function App() {
-  const [show, setShow] = useState(false);
-  const [user, setUser] = useState({
-    id: 1,
-    username: "admin1",
-    email: "admin1@polito.it",
-  });
+  const [surveyList, _setSurveyList] = useState(surveyListExample);
+  const [newSurvey, setNewSurvey] = useState({});
+  const [user, _setUser] = useState(userExample);
 
-  const createSurvey = () => {
-    console.log("create survey");
+  const createSurvey = (s) => {
+    setNewSurvey(s);
+  };
+
+  const handleLogin = (c) => {
+    console.log(c);
   };
 
   return (
     <Router>
-      <Container fluid>
-        <Row className="vheight-100">
-          <Navbar user={user} toggle={() => setShow(!show)} />
-          <Sidebar show={show} />
-          <Switch>
-            <Route
-              path="/login"
-              render={(props) => (
-                <Login {...props} login={(c) => console.log(c)} />
-              )}
-            />
+      <Navbar user={user} />
+      <Container>
+        <Switch>
+          <Route
+            path="/login"
+            render={(props) => <Login {...props} login={handleLogin} />}
+          />
 
-            {/* <Route path="/survey" render={(props) => <Survey {...props} />} /> */}
+          <Route
+            path="/survey"
+            render={(props) => <Survey {...props} survey={newSurvey} />}
+          />
 
-            <Route
-              path="/"
-              render={(props) => (
-                <View
-                  {...props}
-                  title="Dashboard"
-                  createSurvey={createSurvey}
-                />
-              )}
-            />
-          </Switch>
-        </Row>
+          <Route
+            path="/"
+            render={(props) => (
+              <Dashboard
+                {...props}
+                surveyList={surveyList}
+                handleCreate={createSurvey}
+              />
+            )}
+          />
+        </Switch>
       </Container>
     </Router>
   );

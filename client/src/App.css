@@ -17,6 +17,10 @@
   padding-top: 3.5rem;
 }
 
+.icon-action:hover {
+  cursor: pointer
+}
+
 /* CSS for components */
 
 /* Sidebar */
@@ -26,24 +30,24 @@
   color: white;
 } */
 
-.sidebar-router {
-  /* background-color: darkblue; */
+/* .sidebar-router {
+  background-color: darkblue;
   background-color: #fff;
   color: white;
   min-width: 20%;
-}
+} */
 
 /* Main component view */
 
-.view {
-  /* background-color: pink; */
+/* .view {
+  background-color: pink;
   background-color: #f5f7fb;
-}
-
-/* .view-title {
-  background-color: burlywood;
 }*/
 
+.view-title {
+  /* background-color: burlywood; */
+  text-decoration: underline;
+}
 
 /* Profile settings */
 .profile-settings {
@@ -54,13 +58,10 @@
   z-index: 1;
 }
 
-.profile-pic:hover {
-  cursor: pointer
-}
 
 /* Login */
 .login-form {
-  min-width: 450px;
+  max-width: 600px;
 }
 
 /* Bootstrap custom */

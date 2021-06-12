@@ -8,23 +8,15 @@ function Navbar(props) {
   const [show, setShow] = useState(false);
 
   return (
-    <BNavbar
-      collapseOnSelect
-      bg="blue"
-      expand="md"
-      fixed="top"
-      className="sidebar-profile"
-    >
-      <BNavbar.Toggle onClick={props.toggle} label="Toggle navigation" />
-
-      <BNavbar.Brand as={Link} to="/" className="my-auto ml-auto ml-md-0">
+    <BNavbar bg="blue" expand="md" fixed="top" className="sidebar-profile">
+      <BNavbar.Brand as={Link} to="/" className="my-auto  ml-md-0">
         <Icon.PatchQuestionFill className="mr-2" size={32} />
         Survey Manager
       </BNavbar.Brand>
 
       <BNavbar.Brand className="my-auto ml-auto">
         <Icon.PersonSquare
-          className="profile-pic"
+          className="icon-action"
           size={32}
           onClick={() => setShow(!show)}
         />

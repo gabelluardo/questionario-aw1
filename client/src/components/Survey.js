@@ -26,7 +26,7 @@ function Survey(props) {
 
   const handleNewQuestion = (multipleChoice) => {
     if (multipleChoice) {
-      const question = { text: "", mandatory: false };
+      const question = { text: "", optional: false };
       setQuestions((q) => [...q, question]);
     } else {
       const question = { text: "", min: 0, max: 0, choices: [] };
@@ -127,7 +127,8 @@ function Survey(props) {
                 />
               ))}
 
-              <Row className="d-flex justify-content-end pt-5">
+              <hr />
+              <Row className="d-flex justify-content-end pt-2">
                 <Button
                   className="mr-2"
                   variant="secondary"
@@ -161,13 +162,13 @@ function Question(props) {
         />
       </Col>
       <Col>
-        <Form.Label>Mandatory</Form.Label>
+        <Form.Label>Optional</Form.Label>
         <Form.Check
           type="checkbox"
           className="mt-2"
-          label={props.mandatory?.toString()}
-          checked={props.mandatory}
-          onChange={() => props.change(!props.mandatory, props.id, "mandatory")}
+          label={props.optional?.toString()}
+          checked={props.optional}
+          onChange={() => props.change(!props.optional, props.id, "optional")}
         />
       </Col>
     </Row>
@@ -222,34 +223,33 @@ function Question(props) {
           </Form.Label>
           {props.choices?.map((c, k) => (
             <Row key={k}>
-              <Col sm={8}>
+              <Col sm={5}>
                 <Form.Control
                   className="mb-3"
                   type="text"
-                  placeholder="Enter Choice"
+                  placeholder={`Enter Choice ${k + 1}`}
                   value={c}
                   onChange={(e) =>
                     props.change(e.target.value, props.id, "choices", k)
                   }
                 />
               </Col>
-              <Col>
-                <Icon.Trash
-                  size={16}
-                  className="mt-2 icon-action"
-                  onClick={() => props.delete(props.id, k)}
-                />
-              </Col>
+              <Icon.Trash
+                size={18}
+                className="mt-2 ml-2 icon-action"
+                onClick={() => props.delete(props.id, k)}
+              />
             </Row>
           ))}
         </Col>
-        <Col></Col>
       </Row>
     </>
   );
 
   return (
     <Form.Group className="my-4">
+      <hr />
+
       <Form.Label as="h4">
         Question {props.id + 1}
         <span className="ml-3">

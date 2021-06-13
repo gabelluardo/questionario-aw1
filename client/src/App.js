@@ -11,16 +11,31 @@ const surveyListExample = [
     title: "Prova questionario 1",
     id: 1,
     response: 25,
+    admin: "admin1",
   },
   {
     title: "Prova questionario 2",
     id: 2,
     response: 15,
+    admin: "admin2",
   },
   {
     title: "Prova questionario 3",
     id: 3,
     response: 6,
+    admin: "admin1",
+  },
+  {
+    title: "Prova questionario 4",
+    id: 3,
+    response: 0,
+    admin: "admin1",
+  },
+  {
+    title: "Prova questionario 5",
+    id: 3,
+    response: 1,
+    admin: "admin1",
   },
 ];
 const userExample = {
@@ -62,7 +77,7 @@ function App() {
             render={(props) => (
               <Dashboard
                 {...props}
-                surveyList={surveyList}
+                surveyList={surveyList.filter((s) => s.admin === user.username)}
                 handleCreate={createSurvey}
               />
             )}

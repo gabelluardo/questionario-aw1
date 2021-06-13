@@ -1,9 +1,9 @@
 "use strict";
 
-const sqlite = require("sqlite3");
+const sqlite3 = require("sqlite3");
 
 // open the database
-const db = new sqlite.Database("./survey.db", (err) => {
+const db = new sqlite3.Database("./survey.db", (err) => {
   if (err) throw err;
 });
 

@@ -57,7 +57,7 @@ function Dashboard(props) {
                 </Card.Text>
                 <ListGroup variant="flush">
                   {props.surveyList
-                    .filter((s) => s.response)
+                    .filter((s) => s.reply)
                     .map((s, k) => (
                       <SurveyListItem key={k} {...s} {...props} results />
                     ))}
@@ -134,10 +134,10 @@ function CreateModal(props) {
 function SurveyListItem(props) {
   return (
     <ListGroup.Item className="d-flex justify-content-between align-items-center">
-      <span className="badge badge-secondary mr-auto">{props.admin}</span>
+      <span className="badge badge-secondary mr-auto">{props.adminStr}</span>
       <span className="mr-auto">{props.title}</span>
       {!props.results ? null : (
-        <span className="badge badge-info mx-auto ">{props.response}</span>
+        <span className="badge badge-info mx-auto ">{props.reply}</span>
       )}
     </ListGroup.Item>
   );

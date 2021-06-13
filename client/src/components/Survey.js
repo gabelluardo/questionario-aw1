@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   Button,
   Col,
@@ -20,16 +20,26 @@ function Survey(props) {
     const survey = { title: title, questions: questions };
     console.log(survey);
 
-    // console.log("saved into server");
+    props.create(survey);
     // props.history.push("/");
   };
 
   const handleNewQuestion = (multipleChoice) => {
     if (multipleChoice) {
-      const question = { text: "", optional: false };
+      const question = {
+        text: "",
+        optional: false,
+        position: questions.length,
+      };
       setQuestions((q) => [...q, question]);
     } else {
-      const question = { text: "", min: 0, max: 0, choices: [] };
+      const question = {
+        text: "",
+        min: 0,
+        max: 0,
+        choices: [],
+        position: questions.length,
+      };
       setQuestions((q) => [...q, question]);
     }
   };
@@ -57,6 +67,8 @@ function Survey(props) {
   const handleChangePosition = (oldPos, newPos) => {
     const q = questions;
     [q[oldPos], q[newPos]] = [q[newPos], q[oldPos]];
+    q.map((x, i) => (x.position = i));
+
     setQuestions([...q]);
   };
 

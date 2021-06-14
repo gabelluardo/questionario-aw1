@@ -17,7 +17,7 @@ passport.use(
     userDao.getUser(username, password).then((user) => {
       if (!user)
         return done(null, false, {
-          message: "Incorrect username and/or password.",
+          message: "Incorrect username or password.",
         });
 
       return done(null, user);

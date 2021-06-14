@@ -52,13 +52,15 @@ function App() {
       .catch((err) => console.log(err));
   };
 
-  const handleLogin = (credentials) => {
-    API.logIn(credentials)
-      .then((admin) => {
-        setAdmin(admin);
-        setDirty(true);
-      })
-      .catch((err) => console.log(err));
+  const handleLogin = async (credentials) => {
+    try {
+      const admin = await API.logIn(credentials);
+      setAdmin(admin);
+      setDirty(true);
+      return true;
+    } catch (e) {
+      return { err: e };
+    }
   };
 
   const handleLogout = () => {

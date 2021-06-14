@@ -1,4 +1,4 @@
-# Exam #1234: "Exam Title"
+# Exam #1: "Questionario"
 
 ## Student: s290270 Belluardo Gabriele
 
@@ -30,6 +30,9 @@
 -->
 
 - Table `users` - contains `id` `email` `username` `hash`
+- Table `surveys` - contains `id` `admin` `adminStr` `title` `replies`
+- Table `questions` - contains `id` `survey_id` `text` `optional` `min` `max` `choice1` `choice2` ... `choice10`
+- Table `replies` - contains `id` `survey_id` `question_id` `user` `text` `choice1` `choice2` ... `choice10`
 
 ## Main React Components
 

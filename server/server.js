@@ -41,8 +41,8 @@ passport.deserializeUser((id, done) => {
 });
 
 // init express
-const app = new express();
 const port = 3001;
+const app = new express();
 
 app.use(morgan("dev"));
 app.use(express.json());
@@ -71,8 +71,24 @@ app.get("/api/surveys", async (_, res) => {
   try {
     const s = await surveyDao.getAllSurvey();
     res.status(200).json(s);
-  } catch (e) {
-    console.log(e);
+  } catch {
+    res.status(503).json({
+      msg: "Database error during the retrive of surveys.",
+    });
+  }
+});
+
+app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Unauthenticated user!" });
+  }
+
+  const admin = req.user;
+
+  try {
+    const s = await surveyDao.getAdminSurvey(admin);
+    res.status(200).json(s);
+  } catch {
     res.status(503).json({
       msg: "Database error during the retrive of surveys.",
     });
@@ -80,27 +96,64 @@ app.get("/api/surveys", async (_, res) => {
 });
 
 // TODO Add validation + Login
-app.post("/api/surveys", async (req, res) => {
+app.post("/api/admin/surveys", isLoggedIn, async (req, res) => {
   // const err = validationResult(req);
   // if (!err.isEmpty()) {
   //   return res.status(422).json({ errors: err.array() });
   // }
 
   const survey = req.body;
-  // const admin = req.user;
-  const admin = { id: 1, username: "admin1" };
+  const admin = req.user;
 
   try {
     const lastID = await surveyDao.createSurvey(survey, admin);
-    await surveyDao.insertQuestions(survey.questions, lastID);
+    const ok = await surveyDao
+      .insertQuestions(survey.questions, lastID)
+      // Rollback
+      .catch(() => {
+        surveyDao.deleteSurvey(lastID);
+      });
 
-    res.status(200).end();
-  } catch (e) {
-    console.log(e);
+    if (ok) {
+      res.status(200).end();
+    } else {
+      throw ok;
+    }
+  } catch {
     res.status(503).json({
       error: `Database error during creation of task`,
     });
   }
+});
+
+/*** Users APIs ***/
+
+/* login */
+app.post("/api/sessions", function (req, res, next) {
+  passport.authenticate("local", (err, user, info) => {
+    if (err) return next(err);
+    if (!user) {
+      return res.status(401).json(info);
+    }
+    req.login(user, (err) => {
+      if (err) return next(err);
+
+      return res.json(req.user);
+    });
+  })(req, res, next);
+});
+
+/* logout */
+app.delete("/api/sessions/current", (req, res) => {
+  req.logout();
+  res.end();
+});
+
+/* check whether the user is logged in or not */
+app.get("/api/sessions/current", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.status(200).json(req.user);
+  } else res.status(401).json({ error: "Unauthenticated user!" });
 });
 
 // activate the server

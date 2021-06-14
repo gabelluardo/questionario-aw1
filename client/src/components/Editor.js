@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import {
   Button,
   Col,
@@ -9,7 +9,7 @@ import {
 } from "react-bootstrap";
 import * as Icon from "react-bootstrap-icons";
 
-function Survey(props) {
+function Editor(props) {
   const [title, setTitle] = useState(props.survey.title || "");
   const [questions, setQuestions] = useState(props.survey.questions || []);
 
@@ -21,7 +21,7 @@ function Survey(props) {
     console.log(survey);
 
     props.create(survey);
-    // props.history.push("/");
+    props.history.push("/");
   };
 
   const handleNewQuestion = (multipleChoice) => {
@@ -29,16 +29,14 @@ function Survey(props) {
       const question = {
         text: "",
         optional: false,
-        position: questions.length,
       };
       setQuestions((q) => [...q, question]);
     } else {
       const question = {
         text: "",
         min: 0,
-        max: 0,
+        max: 1,
         choices: [],
-        position: questions.length,
       };
       setQuestions((q) => [...q, question]);
     }
@@ -67,8 +65,6 @@ function Survey(props) {
   const handleChangePosition = (oldPos, newPos) => {
     const q = questions;
     [q[oldPos], q[newPos]] = [q[newPos], q[oldPos]];
-    q.map((x, i) => (x.position = i));
-
     setQuestions([...q]);
   };
 
@@ -109,7 +105,7 @@ function Survey(props) {
           </DropdownButton>
         </Row>
         <Row className="align-items-center">
-          <Col sm={9} className="mt-4 mx-auto">
+          <Col sm={10} className="mt-4 mx-auto">
             <Form onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label as="h4">Title</Form.Label>
@@ -144,8 +140,7 @@ function Survey(props) {
                 <Button
                   className="mr-2"
                   variant="secondary"
-                  // onClick={() => props.history.push("/")}
-                  onClick={() => console.log("cancel")}
+                  onClick={() => props.history.push("/")}
                 >
                   Cancel
                 </Button>
@@ -291,4 +286,4 @@ function Question(props) {
   );
 }
 
-export default Survey;
+export default Editor;

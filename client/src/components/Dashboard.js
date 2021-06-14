@@ -16,51 +16,48 @@ function Dashboard(props) {
   return (
     <Row className="vheight-100">
       <Col className="px-5 py-4 mt-5">
-        {/* Title */}
         <Row className="mx-auto">
           <h1 className="view-title my-auto mr-auto">
             <b>Dashboard</b>
           </h1>
-          <Button
-            onClick={() => setOpen(true)}
-            variant="green"
-            className="my-auto ml-auto mr-3 p-1"
-          >
-            Create Survey
-          </Button>
-          <CreateModal show={open} setClose={() => setOpen(false)} {...props} />
+          {!props.user ? null : (
+            <>
+              <Button
+                onClick={() => setOpen(true)}
+                variant="green"
+                className="my-auto ml-auto mr-3 p-1"
+              >
+                Create Survey
+              </Button>
+              <CreateModal
+                show={open}
+                setClose={() => setOpen(false)}
+                {...props}
+              />
+            </>
+          )}
         </Row>
 
-        {/* Action Card */}
         <Row className="justify-content-center py-5">
-          <Col sm={6}>
+          <Col sm={10}>
             <Card className="my-3">
-              <Card.Header as="h4">My Surveys</Card.Header>
+              <Card.Header as="h4">
+                {props.user ? "My" : "All"} Surveys
+              </Card.Header>
               <Card.Body>
                 <Card.Text className="text-muted">
-                  These are your published surveys
+                  These are {props.user ? "results for your" : "all"} published
+                  surveys
                 </Card.Text>
                 <ListGroup variant="flush">
-                  {props.surveyList.map((s, k) => (
-                    <SurveyListItem key={k} {...s} {...props} />
+                  {props.list.map((s, k) => (
+                    <SurveyListItem
+                      key={k}
+                      {...s}
+                      {...props}
+                      results={props.user}
+                    />
                   ))}
-                </ListGroup>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col sm={6}>
-            <Card className="my-3">
-              <Card.Header as="h4">My Results</Card.Header>
-              <Card.Body>
-                <Card.Text className="text-muted">
-                  These are results for your surveys
-                </Card.Text>
-                <ListGroup variant="flush">
-                  {props.surveyList
-                    .filter((s) => s.reply)
-                    .map((s, k) => (
-                      <SurveyListItem key={k} {...s} {...props} results />
-                    ))}
                 </ListGroup>
               </Card.Body>
             </Card>
@@ -68,6 +65,20 @@ function Dashboard(props) {
         </Row>
       </Col>
     </Row>
+  );
+}
+
+function SurveyListItem(props) {
+  return (
+    <ListGroup.Item className="d-flex justify-content-center align-items-center">
+      <span className="badge badge-secondary mr-auto">{props.adminStr}</span>
+      <span className={props.results ? "mx-auto" : "mr-auto"}>
+        {props.title}
+      </span>
+      {!props.results ? null : (
+        <span className="badge badge-info ml-auto">{props.replies}</span>
+      )}
+    </ListGroup.Item>
   );
 }
 
@@ -82,18 +93,15 @@ function CreateModal(props) {
     setValidated(true);
 
     if (form.checkValidity()) {
-      // TODO Create survey and redirect to "/survey"
       const survey = { title: title, questions: [] };
 
       props.handleCreate(survey);
-      handleClose();
-      props.history.push("/survey");
+      props.history.push("/editor");
     }
   };
 
   const handleClose = () => {
     props.setClose();
-    setTitle("");
     setValidated(false);
   };
 
@@ -128,18 +136,6 @@ function CreateModal(props) {
         </Modal.Footer>
       </Form>
     </Modal>
-  );
-}
-
-function SurveyListItem(props) {
-  return (
-    <ListGroup.Item className="d-flex justify-content-between align-items-center">
-      <span className="badge badge-secondary mr-auto">{props.adminStr}</span>
-      <span className="mr-auto">{props.title}</span>
-      {!props.results ? null : (
-        <span className="badge badge-info mx-auto ">{props.reply}</span>
-      )}
-    </ListGroup.Item>
   );
 }
 

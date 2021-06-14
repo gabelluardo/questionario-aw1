@@ -24,7 +24,8 @@ function Navbar(props) {
           show={show}
           setShow={setShow}
           user={props.user}
-          isLogged={false}
+          isLogged={props.user ? true : false}
+          logout={props.logout}
         />
       </BNavbar.Brand>
     </BNavbar>
@@ -34,6 +35,14 @@ function Navbar(props) {
 function Profile(props) {
   const ref = useRef();
   useOnClickOutside(ref, () => props.setShow(false));
+
+  const handleClick = () => {
+    if (props.isLogged) {
+      props.logout();
+    }
+
+    props.setShow(false);
+  };
 
   return !props.show ? null : (
     <Card ref={ref} className="profile-settings">
@@ -46,12 +55,8 @@ function Profile(props) {
           {props.user?.email || ""}
         </Card.Subtitle>
       </Card.Header>
-      <ListGroup variant="flush" onClick={() => props.setShow(false)}>
-        <ListGroup.Item
-          action
-          as={Link}
-          to={props.isLogged ? "/logout" : "/login"}
-        >
+      <ListGroup variant="flush" onClick={handleClick}>
+        <ListGroup.Item action as={Link} to={props.isLogged ? "/" : "/login"}>
           {props.isLogged ? (
             <Icon.BoxArrowRight size={20} className="mr-2" />
           ) : (

@@ -11,12 +11,11 @@ function Login(props) {
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const credentials = { email: email, password: password };
+    const credentials = { username: email, password: password };
     let valid = true;
     if (email === "" || password === "" || password.length < 6) {
       valid = false;
       setError(true);
-      // setTimeout(() => setError(false), 3000);
     }
 
     if (valid) {

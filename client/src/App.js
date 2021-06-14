@@ -3,32 +3,48 @@ import { useState, useEffect } from "react";
 import { Container } from "react-bootstrap";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 
-import { Navbar, Dashboard, Login, Survey } from "./components";
+import { Navbar, Dashboard, Login, Editor } from "./components";
 import * as API from "./API";
-
-// TODO delete example
-const userExample = {
-  id: 1,
-  username: "admin1",
-  email: "admin1@polito.it",
-};
 
 function App() {
   const [surveyList, setSurveyList] = useState([]);
   const [newSurvey, setNewSurvey] = useState({});
-  const [user, _setUser] = useState(userExample);
+  const [admin, setAdmin] = useState(null);
   const [dirty, setDirty] = useState(true);
+
+  // User info if already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        // Due to httpOnly cookie, this request
+        // will always fail on first access
+        const user = await API.getUserInfo();
+        setAdmin(user);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    checkAuth()
+      .then(() => setDirty(true))
+      .catch((err) => console.log(err));
+  }, []);
 
   useEffect(() => {
     async function getSurveys() {
-      const s = await API.getAllSurveys();
-      setSurveyList(s);
+      if (admin) {
+        const as = await API.getAdminSurveys();
+        setSurveyList(as);
+      } else {
+        const s = await API.getAllSurveys();
+        setSurveyList(s);
+      }
     }
 
     if (dirty) {
       getSurveys().then(setDirty(false));
     }
-  }, [dirty]);
+  }, [dirty, admin]);
 
   const createSurvey = (s) => {
     API.createSurvey(s)
@@ -36,17 +52,27 @@ function App() {
       .catch((err) => console.log(err));
   };
 
-  const initNewSurvey = (t) => {
-    setNewSurvey(t);
+  const handleLogin = (credentials) => {
+    API.logIn(credentials)
+      .then((admin) => {
+        setAdmin(admin);
+        setDirty(true);
+      })
+      .catch((err) => console.log(err));
   };
 
-  const handleLogin = (c) => {
-    console.log(c);
+  const handleLogout = () => {
+    API.logOut()
+      .then(() => {
+        setAdmin(null);
+        setDirty(true);
+      })
+      .catch((err) => console.log(err));
   };
 
   return (
     <Router>
-      <Navbar user={user} />
+      <Navbar user={admin} logout={handleLogout} />
       <Container>
         <Switch>
           <Route
@@ -55,12 +81,12 @@ function App() {
           />
 
           <Route
-            path="/survey"
+            path="/editor"
             render={(props) => (
-              <Survey
+              <Editor
                 {...props}
                 survey={newSurvey}
-                user={user}
+                user={admin}
                 create={createSurvey}
               />
             )}
@@ -71,8 +97,9 @@ function App() {
             render={(props) => (
               <Dashboard
                 {...props}
-                surveyList={surveyList.filter((s) => s.admin === user.id)}
-                handleCreate={initNewSurvey}
+                list={surveyList}
+                user={admin}
+                handleCreate={(t) => setNewSurvey(t)}
               />
             )}
           />

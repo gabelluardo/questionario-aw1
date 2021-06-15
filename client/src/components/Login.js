@@ -116,7 +116,7 @@ function Login(props) {
 }
 
 function EyeIcon(props) {
-  return props.show ? <Icon.EyeSlash /> : <Icon.Eye />;
+  return props.show ? <Icon.Eye /> : <Icon.EyeSlash />;
 }
 
 export default Login;

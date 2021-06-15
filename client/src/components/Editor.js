@@ -25,21 +25,18 @@ function Editor(props) {
   };
 
   const handleNewQuestion = (multipleChoice) => {
-    if (multipleChoice) {
-      const question = {
-        text: "",
-        optional: false,
-      };
-      setQuestions((q) => [...q, question]);
-    } else {
-      const question = {
-        text: "",
-        min: 0,
-        max: 1,
-        choices: [],
-      };
-      setQuestions((q) => [...q, question]);
-    }
+    const open = {
+      text: "",
+      optional: false,
+    };
+    const closed = {
+      text: "",
+      min: 0,
+      max: 1,
+      choices: [""],
+    };
+    const question = multipleChoice ? closed : open;
+    setQuestions((q) => [...q, question]);
   };
 
   const handleChange = (value, key, type, choiceKey = null) => {
@@ -91,14 +88,14 @@ function Editor(props) {
             <Dropdown.Item
               as={Button}
               variant="outline-light"
-              onClick={() => handleNewQuestion(true)}
+              onClick={() => handleNewQuestion(false)}
             >
               Open-ended
             </Dropdown.Item>
             <Dropdown.Item
               as={Button}
               variant="outline-light"
-              onClick={() => handleNewQuestion(false)}
+              onClick={() => handleNewQuestion(true)}
             >
               Multiple choice
             </Dropdown.Item>

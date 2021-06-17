@@ -1,14 +1,21 @@
 import { useState, useEffect } from "react";
 
 import { Container } from "react-bootstrap";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect,
+} from "react-router-dom";
 
-import { Navbar, Dashboard, Login, Editor } from "./components";
+import { Navbar, Dashboard, Login, Editor, Survey } from "./components";
 import * as API from "./API";
 
 function App() {
   const [surveyList, setSurveyList] = useState([]);
   const [newSurvey, setNewSurvey] = useState({});
+  const [survey, setSurvey] = useState({});
+
   const [admin, setAdmin] = useState(null);
   const [dirty, setDirty] = useState(true);
 
@@ -46,10 +53,14 @@ function App() {
     }
   }, [dirty, admin]);
 
-  const createSurvey = (s) => {
-    API.createSurvey(s)
-      .then(setDirty(true))
-      .catch((err) => console.log(err));
+  const createSurvey = async (s) => {
+    try {
+      await API.createSurvey(s);
+      setDirty(true);
+      return true;
+    } catch (e) {
+      return { err: e };
+    }
   };
 
   const handleLogin = async (credentials) => {
@@ -72,6 +83,18 @@ function App() {
       .catch((err) => console.log(err));
   };
 
+  const handleReply = () => {};
+
+  const handleGetSurvey = () => {};
+
+  const handleGetQuestions = async (id) => {
+    try {
+      return await API.getQuestionsByID(id);
+    } catch (e) {
+      return { err: e };
+    }
+  };
+
   return (
     <Router>
       <Navbar user={admin} logout={handleLogout} />
@@ -84,12 +107,30 @@ function App() {
 
           <Route
             path="/editor"
+            render={(props) =>
+              admin ? (
+                <Editor
+                  {...props}
+                  survey={newSurvey}
+                  user={admin}
+                  create={createSurvey}
+                />
+              ) : (
+                <Redirect to="/" />
+              )
+            }
+          />
+
+          <Route
+            path="/survey"
             render={(props) => (
-              <Editor
+              <Survey
                 {...props}
-                survey={newSurvey}
-                user={admin}
-                create={createSurvey}
+                surveyList={surveyList}
+                survey={survey}
+                // getSurvey={handleGetSurvey}
+                reply={handleReply}
+                retriveQuestions={handleGetQuestions}
               />
             )}
           />
@@ -101,6 +142,7 @@ function App() {
                 {...props}
                 list={surveyList}
                 user={admin}
+                handleSelect={(s) => setSurvey(s)}
                 handleCreate={(t) => setNewSurvey(t)}
               />
             )}

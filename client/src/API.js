@@ -14,6 +14,16 @@ export async function getAllSurveys() {
   }
 }
 
+export async function getQuestionsByID(id) {
+  const response = await fetch(BASEURL + "/questions/" + id);
+  const s = await response.json();
+  if (response.ok) {
+    return s;
+  } else {
+    throw s;
+  }
+}
+
 export async function getAdminSurveys() {
   const response = await fetch(BASEURL + "/admin/surveys");
   const s = await response.json();

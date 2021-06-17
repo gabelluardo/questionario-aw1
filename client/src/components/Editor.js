@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   Button,
   Col,
   Form,
@@ -13,19 +14,37 @@ function Editor(props) {
   const [title, setTitle] = useState(props.survey.title || "");
   const [questions, setQuestions] = useState(props.survey.questions || []);
 
-  // TODO add validation
-  const handleSubmit = (e) => {
+  const [validated, setValidated] = useState(false);
+  const [alert, setAlert] = useState(null);
+
+  const handleSubmit = async (e) => {
+    const form = e.currentTarget;
     e.preventDefault();
+    e.stopPropagation();
 
-    const survey = { title: title, questions: questions };
-    console.log(survey);
+    if (!questions.length) {
+      setAlert("Insert at least one question");
+      setValidated(false);
+      return;
+    } else {
+      setValidated(true);
+    }
 
-    props.create(survey);
-    props.history.push("/");
+    if (form.checkValidity()) {
+      const survey = { title: title, questions: questions };
+      console.log(survey);
+
+      const res = await props.create(survey);
+      if (!res.err) {
+        props.history.push("/");
+      } else {
+        setAlert(res.err);
+      }
+    }
   };
 
   const handleNewQuestion = (multipleChoice) => {
-    const open = {
+    const opened = {
       text: "",
       optional: false,
     };
@@ -35,7 +54,7 @@ function Editor(props) {
       max: 1,
       choices: [""],
     };
-    const question = multipleChoice ? closed : open;
+    const question = multipleChoice ? closed : opened;
     setQuestions((q) => [...q, question]);
   };
 
@@ -103,10 +122,22 @@ function Editor(props) {
         </Row>
         <Row className="align-items-center">
           <Col sm={10} className="mt-4 mx-auto">
-            <Form onSubmit={handleSubmit}>
+            {!alert ? null : (
+              <Alert
+                dismissible
+                className="text-center"
+                variant="danger"
+                onClose={() => setAlert(null)}
+              >
+                {alert}
+              </Alert>
+            )}
+
+            <Form noValidate validated={validated} onSubmit={handleSubmit}>
               <Form.Group className="mb-3" controlId="formBasicEmail">
                 <Form.Label as="h4">Title</Form.Label>
                 <Form.Control
+                  required
                   type="text"
                   placeholder="Enter Title"
                   value={title}
@@ -159,11 +190,15 @@ function Question(props) {
       <Col sm={8}>
         <Form.Label>Text</Form.Label>
         <Form.Control
+          required
           type="text"
           placeholder="Enter Question Text"
           value={props.text}
           onChange={(ev) => props.change(ev.target.value, props.id, "text")}
         />
+        <Form.Control.Feedback type="invalid">
+          Text is required!
+        </Form.Control.Feedback>
       </Col>
       <Col>
         <Form.Label>Optional</Form.Label>
@@ -184,11 +219,15 @@ function Question(props) {
         <Col sm={8}>
           <Form.Label>Text</Form.Label>
           <Form.Control
+            required
             type="text"
             placeholder="Enter Question Text"
             value={props.text}
             onChange={(e) => props.change(e.target.value, props.id, "text")}
           />
+          <Form.Control.Feedback type="invalid">
+            Text is required!
+          </Form.Control.Feedback>
         </Col>
         <Col>
           <Form.Label>Max</Form.Label>
@@ -227,9 +266,9 @@ function Question(props) {
           </Form.Label>
           {props.choices?.map((c, k) => (
             <Row key={k}>
-              <Col sm={5}>
+              <Col sm={5} className="pb-3">
                 <Form.Control
-                  className="mb-3"
+                  required
                   type="text"
                   placeholder={`Enter Choice ${k + 1}`}
                   value={c}
@@ -237,12 +276,17 @@ function Question(props) {
                     props.change(e.target.value, props.id, "choices", k)
                   }
                 />
+                <Form.Control.Feedback type="invalid">
+                  Text is required!
+                </Form.Control.Feedback>
               </Col>
-              <Icon.Trash
-                size={18}
-                className="mt-2 ml-2 icon-action"
-                onClick={() => props.delete(props.id, k)}
-              />
+              {!k ? null : (
+                <Icon.Trash
+                  size={18}
+                  className="mt-2 ml-2 icon-action"
+                  onClick={() => props.delete(props.id, k)}
+                />
+              )}
             </Row>
           ))}
         </Col>

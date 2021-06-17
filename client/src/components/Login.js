@@ -14,6 +14,7 @@ function Login(props) {
   // NOTE Valid default credentials for easy testing
   const [email, setEmail] = useState("admin1@polito.it");
   const [password, setPassword] = useState("passadmin1");
+
   const [passwordShown, setPasswordShown] = useState(false);
   const [invalid, setInvalid] = useState(false);
   const [fail, setFail] = useState("");
@@ -60,7 +61,7 @@ function Login(props) {
                 {!fail ? null : (
                   <Alert
                     dismissible
-                    className=" text-center"
+                    className="text-center"
                     variant="danger"
                     onClose={() => setFail(null)}
                   >

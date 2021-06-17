@@ -8,6 +8,7 @@ import {
   Form,
   ListGroup,
 } from "react-bootstrap";
+import { Link } from "react-router-dom";
 // import * as Icon from "react-bootstrap-icons";
 
 function Dashboard(props) {
@@ -53,9 +54,9 @@ function Dashboard(props) {
                   {props.list.map((s, k) => (
                     <SurveyListItem
                       key={k}
-                      {...s}
-                      {...props}
+                      survey={s}
                       results={props.user}
+                      {...props}
                     />
                   ))}
                 </ListGroup>
@@ -69,14 +70,20 @@ function Dashboard(props) {
 }
 
 function SurveyListItem(props) {
+  const { adminStr, title, replies } = props.survey;
+
   return (
     <ListGroup.Item className="d-flex justify-content-center align-items-center">
-      <span className="badge badge-secondary mr-auto">{props.adminStr}</span>
-      <span className={props.results ? "mx-auto" : "mr-auto"}>
-        {props.title}
-      </span>
+      <span className="badge badge-secondary mr-auto">{adminStr}</span>
+      <Link
+        className={props.results ? "mx-auto" : "mr-auto"}
+        to="/survey"
+        onClick={() => props.handleSelect(props.survey)}
+      >
+        {title}
+      </Link>
       {!props.results ? null : (
-        <span className="badge badge-info ml-auto">{props.replies}</span>
+        <span className="badge badge-info ml-auto">{replies}</span>
       )}
     </ListGroup.Item>
   );

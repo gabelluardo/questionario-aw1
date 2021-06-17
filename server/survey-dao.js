@@ -9,6 +9,35 @@ exports.getAllSurvey = () => {
   });
 };
 
+exports.getAllQuestions = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT * FROM questions WHERE survey_id=?";
+    db.all(sql, [id], (err, rows) =>
+      err
+        ? reject(err)
+        : resolve(
+            rows.map((r) => {
+              const { question_id, optional, min, max, text } = r;
+              const choices = [
+                r.choice1,
+                r.choice2,
+                r.choice3,
+                r.choice4,
+                r.choice5,
+                r.choice6,
+                r.choice7,
+                r.choice8,
+                r.choice9,
+                r.choice10,
+              ].filter((c) => c);
+
+              return { question_id, text, optional, min, max, choices };
+            })
+          )
+    );
+  });
+};
+
 exports.getAdminSurvey = (admin) => {
   return new Promise((resolve, reject) => {
     const sql = "SELECT * FROM surveys WHERE admin=?";

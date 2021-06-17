@@ -78,6 +78,20 @@ app.get("/api/surveys", async (_, res) => {
   }
 });
 
+app.get("/api/questions/:id", async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const q = await surveyDao.getAllQuestions(id);
+    const sorted = q.sort((a, b) => a.question_id - b.question_id);
+    res.status(200).json(sorted);
+  } catch {
+    res.status(503).json({
+      msg: "Database error during the retrive of questions.",
+    });
+  }
+});
+
 app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Unauthenticated user!" });
@@ -97,6 +111,10 @@ app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
 
 // TODO Add validation + Login
 app.post("/api/admin/surveys", isLoggedIn, async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Unauthenticated user!" });
+  }
+
   // const err = validationResult(req);
   // if (!err.isEmpty()) {
   //   return res.status(422).json({ errors: err.array() });

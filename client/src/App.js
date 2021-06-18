@@ -83,7 +83,14 @@ function App() {
       .catch((err) => console.log(err));
   };
 
-  const handleReply = () => {};
+  const handleReply = async () => {
+    try {
+      console.log("call server");
+      return true;
+    } catch (e) {
+      return { err: e };
+    }
+  };
 
   const handleGetSurvey = () => {};
 
@@ -130,7 +137,7 @@ function App() {
                   surveyList={surveyList}
                   survey={survey}
                   // getSurvey={handleGetSurvey}
-                  reply={handleReply}
+                  handleReply={handleReply}
                   handleGetQuestions={handleGetQuestions}
                 />
               ) : (

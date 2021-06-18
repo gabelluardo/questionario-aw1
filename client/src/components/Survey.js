@@ -5,6 +5,7 @@ import * as Icon from "react-bootstrap-icons";
 function Survey(props) {
   const [replies, setReplies] = useState([]);
   const [questions, setQuestions] = useState([]);
+  const [user, setUser] = useState("");
 
   const [validated, setValidated] = useState(false);
   const [alert, setAlert] = useState(null);
@@ -13,7 +14,6 @@ function Survey(props) {
     async function getQuestions(id) {
       const q = await props.handleGetQuestions(id);
       if (!q.err) {
-        console.log(q);
         setQuestions(q);
         const r = q.map((q) => ({
           isInvalid: null,
@@ -54,22 +54,26 @@ function Survey(props) {
     e.stopPropagation();
 
     const valid = customValidation();
-
     if (form.checkValidity() && valid) {
-      console.log("isValid");
+      const reply = replies.map((r) =>
+        Object({
+          text: r.text || null,
+          question_id: r.id,
+          choices: r.choices,
+          user: user,
+          survey_id: props.survey.id,
+        })
+      );
+      console.log(reply);
 
-      // const survey = { title: title, questions: questions };
-      // console.log(survey);
-
-      // const res = await props.create(survey);
-      // if (!res.err) {
-      //   props.history.push("/");
-      // } else {
-      //   setAlert(res.err);
-      // }
+      const res = await props.handleReply(reply);
+      if (!res.err) {
+        // props.history.push("/");
+      } else {
+        setAlert(res.err);
+      }
     }
 
-    console.log(replies);
     setValidated(true);
   };
 
@@ -142,20 +146,39 @@ function Survey(props) {
                   />
                 </Form.Group>
               ))}
-
-              <Row className="d-flex justify-content-end pt-2">
-                <Button
-                  className="mx-3"
-                  variant="secondary"
-                  // onClick={() => props.history.push("/")}
-                  onClick={() => setValidated(false)}
-                >
-                  Cancel
-                </Button>
-                <Button className="mr-3" variant="success" type="submit">
-                  Send
-                </Button>
-              </Row>
+              <Form.Group as={Row} className="pb-1 justify-content-end">
+                <Col sm={4}>
+                  <Form.Label as="h4">Sign</Form.Label>
+                  <Form.Control
+                    required
+                    type="text"
+                    placeholder="Enter Your Name"
+                    value={user}
+                    isInvalid={!user.length && validated}
+                    isValid={user.length && validated}
+                    onChange={(e) => setUser(e.target.value)}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    Please sign this survey reply!
+                  </Form.Control.Feedback>
+                </Col>
+              </Form.Group>
+              {/* <hr /> */}
+              {!questions.length ? null : (
+                <Row className="d-flex justify-content-end pt-2">
+                  <Button
+                    className="mx-3"
+                    variant="secondary"
+                    // onClick={() => props.history.push("/")}
+                    onClick={() => setValidated(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button className="mr-3" variant="success" type="submit">
+                    Send
+                  </Button>
+                </Row>
+              )}
             </Form>
           </Col>
         </Row>
@@ -208,6 +231,7 @@ function Question(props) {
                   !props.reply?.isInvalid &&
                   props.reply?.isInvalid !== null
                 }
+                checked={props.reply?.choices[k]}
                 label={text}
                 onChange={() =>
                   props.changeCheck(
@@ -224,7 +248,7 @@ function Question(props) {
 
         {!(props.reply?.isInvalid && props.validated) ? null : (
           <Form.Text className="text-danger">
-            {`Almost ${props.max} and at least ${props.min} answer!`}
+            {`Almost ${props.max} and at least ${props.min} answers!`}
           </Form.Text>
         )}
       </Col>
@@ -233,7 +257,7 @@ function Question(props) {
 
   return (
     <Form.Group className="my-4">
-      <Row>
+      <Form.Row>
         <Col>
           <Form.Label as="h4" className="text-wrap">
             {props.id + 1}. {props.text}{" "}
@@ -246,7 +270,7 @@ function Question(props) {
             char={props.reply?.text.length}
           />
         </Col>
-      </Row>
+      </Form.Row>
       {props.closed ? closedType : openedType}
       <hr />
     </Form.Group>

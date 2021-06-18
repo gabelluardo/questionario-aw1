@@ -34,7 +34,7 @@ function Editor(props) {
 
       const res = await props.create(survey);
       if (!res.err) {
-        props.history.push("/");
+        return props.history.push("/");
       } else {
         setAlert(res.err);
       }

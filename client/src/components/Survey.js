@@ -4,30 +4,53 @@ import * as Icon from "react-bootstrap-icons";
 
 function Survey(props) {
   const [replies, setReplies] = useState([]);
+  const [allReplies, setAllReplies] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [user, setUser] = useState("");
 
   const [validated, setValidated] = useState(false);
   const [alert, setAlert] = useState(null);
+  const [position, setPosition] = useState(0);
 
   useEffect(() => {
     async function getQuestions(id) {
       const q = await props.handleGetQuestions(id);
       if (!q.err) {
         setQuestions(q);
-        const r = q.map((q) => ({
-          isInvalid: null,
-          id: q.question_id,
-          choices: [...q.choices].fill(false),
-          text: "",
-        }));
 
-        setReplies(r);
+        if (props.readOnly) {
+          const r = await props.handleGetReply(id);
+          const all = parseAllReplies(r);
+          const current = all[0];
+
+          if (all) {
+            setReplies(current.replies);
+            setUser(current.user);
+            setAllReplies(all);
+          }
+        } else {
+          const r = q.map((q) => ({
+            isInvalid: null,
+            id: q.question_id,
+            choices: [...q.choices].fill(false),
+            text: "",
+          }));
+          setReplies(r);
+        }
       }
     }
 
     getQuestions(props.survey.id);
   }, [props]);
+
+  useEffect(() => {
+    if (props.readOnly) {
+      const r = allReplies[position];
+      if (r) {
+        setReplies([...r.replies]);
+      }
+    }
+  }, [position]);
 
   const customValidation = () => {
     const r = replies.map((r) => {
@@ -48,6 +71,22 @@ function Survey(props) {
     return !replies.filter((r) => r.isInvalid).length;
   };
 
+  const parseAllReplies = (r) => {
+    let res = [];
+
+    r.forEach((e) => {
+      const r = res.find((r) => r.user === e.user);
+
+      if (r) {
+        r.replies.push(e);
+      } else {
+        res.push({ user: e.user, replies: [e] });
+      }
+    });
+
+    return res;
+  };
+
   const handleSubmit = async (e) => {
     const form = e.currentTarget;
     e.preventDefault();
@@ -64,13 +103,13 @@ function Survey(props) {
           survey_id: props.survey.id,
         })
       );
-      console.log(reply);
 
       const res = await props.handleReply(reply);
       if (!res.err) {
-        // props.history.push("/");
+        return props.history.push("/");
       } else {
         setAlert(res.err);
+        setValidated(false);
       }
     }
 
@@ -137,6 +176,7 @@ function Survey(props) {
                   <Question
                     {...q}
                     id={k}
+                    readOnly={props.readOnly}
                     changeText={handleChangeText}
                     changeCheck={handleChangeCheck}
                     closed={q.optional == null}
@@ -151,6 +191,7 @@ function Survey(props) {
                   <Form.Label as="h4">Sign</Form.Label>
                   <Form.Control
                     required
+                    readOnly={props.readOnly}
                     type="text"
                     placeholder="Enter Your Name"
                     value={user}
@@ -164,13 +205,13 @@ function Survey(props) {
                 </Col>
               </Form.Group>
               {/* <hr /> */}
-              {!questions.length ? null : (
+              {!questions.length || props.readOnly ? null : (
                 <Row className="d-flex justify-content-end pt-2">
                   <Button
                     className="mx-3"
                     variant="secondary"
-                    // onClick={() => props.history.push("/")}
-                    onClick={() => setValidated(false)}
+                    onClick={() => props.history.push("/")}
+                    // onClick={() => setValidated(false)}
                   >
                     Cancel
                   </Button>
@@ -182,6 +223,24 @@ function Survey(props) {
             </Form>
           </Col>
         </Row>
+        {!props.readOnly ? null : (
+          <Row className="d-flex justify-content-between pt-5">
+            {!position ? null : (
+              <Icon.ArrowReturnLeft
+                size={32}
+                className="icon-action mr-auto"
+                onClick={() => setPosition((p) => p - 1)}
+              />
+            )}
+            {position === replies.length ? null : (
+              <Icon.ArrowReturnRight
+                size={32}
+                className="icon-action ml-auto"
+                onClick={() => setPosition((p) => p + 1)}
+              />
+            )}
+          </Row>
+        )}
       </Col>
     </Row>
   );
@@ -193,10 +252,11 @@ function Question(props) {
       <Col>
         <Form.Control
           required={!props.optional}
+          readOnly={props.readOnly}
           as="textarea"
           rows={5}
           placeholder="Enter Your Answer"
-          value={props.reply?.text}
+          value={props.reply?.text || ""}
           isInvalid={props.reply?.isInvalid && props.validated}
           isValid={
             props.validated &&
@@ -206,7 +266,7 @@ function Question(props) {
           onChange={(ev) => props.changeText(ev.target.value, props.id)}
         />
         <Form.Control.Feedback type="invalid">
-          {!(props.reply?.text.length > 200)
+          {!(props.reply?.text?.length > 200)
             ? "This answer is mandatory!"
             : "This answer must have almost 200 characters!"}
         </Form.Control.Feedback>
@@ -222,6 +282,7 @@ function Question(props) {
             <Col sm={5}>
               <Form.Check
                 custom
+                disabled={props.readOnly}
                 id={`custom-${props.id}-${k}`}
                 name={`group-${props.id}`}
                 type={props.radio ? "radio" : "checkbox"}
@@ -231,7 +292,7 @@ function Question(props) {
                   !props.reply?.isInvalid &&
                   props.reply?.isInvalid !== null
                 }
-                checked={props.reply?.choices[k]}
+                defaultChecked={props.reply?.choices[k]}
                 label={text}
                 onChange={() =>
                   props.changeCheck(
@@ -266,8 +327,8 @@ function Question(props) {
         <Col sm={3}>
           <Info
             {...props}
-            warning={props.reply?.text.length > 200}
-            char={props.reply?.text.length}
+            warning={props.reply?.text?.length > 200}
+            char={props.reply?.text?.length}
           />
         </Col>
       </Form.Row>

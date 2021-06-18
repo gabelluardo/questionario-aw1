@@ -83,9 +83,9 @@ function App() {
       .catch((err) => console.log(err));
   };
 
-  const handleReply = async () => {
+  const handleReply = async (reply) => {
     try {
-      console.log("call server");
+      await API.sendReply(reply);
       return true;
     } catch (e) {
       return { err: e };
@@ -97,6 +97,14 @@ function App() {
   const handleGetQuestions = async (id) => {
     try {
       return await API.getQuestionsByID(id);
+    } catch (e) {
+      return { err: e };
+    }
+  };
+
+  const handleGetReply = async (id) => {
+    try {
+      return await API.getRepliesByID(id);
     } catch (e) {
       return { err: e };
     }
@@ -131,14 +139,15 @@ function App() {
           <Route
             path="/survey"
             render={(props) =>
-              survey ? (
+              survey && (survey.replies || !admin) ? (
                 <Survey
                   {...props}
-                  surveyList={surveyList}
                   survey={survey}
-                  // getSurvey={handleGetSurvey}
+                  readOnly={admin ? true : false}
+                  getSurvey={(s) => setSurvey(s)}
                   handleReply={handleReply}
                   handleGetQuestions={handleGetQuestions}
+                  handleGetReply={handleGetReply}
                 />
               ) : (
                 <Redirect to="/" />
@@ -151,8 +160,8 @@ function App() {
             render={(props) => (
               <Dashboard
                 {...props}
-                list={surveyList}
                 user={admin}
+                list={surveyList}
                 handleSelect={(s) => setSurvey(s)}
                 handleCreate={(t) => setNewSurvey(t)}
               />

@@ -24,6 +24,16 @@ export async function getQuestionsByID(id) {
   }
 }
 
+export async function getRepliesByID(id) {
+  const response = await fetch(BASEURL + "/admin/replies/" + id);
+  const r = await response.json();
+  if (response.ok) {
+    return r;
+  } else {
+    throw r;
+  }
+}
+
 export async function getAdminSurveys() {
   const response = await fetch(BASEURL + "/admin/surveys");
   const s = await response.json();
@@ -47,6 +57,22 @@ export async function createSurvey(s) {
     return null;
   } else {
     throw s;
+  }
+}
+
+export async function sendReply(r) {
+  const response = await fetch(BASEURL + "/replies", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(r),
+  });
+
+  if (response.ok) {
+    return null;
+  } else {
+    throw "Errore del server";
   }
 }
 

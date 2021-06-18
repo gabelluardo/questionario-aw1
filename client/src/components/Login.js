@@ -35,6 +35,8 @@ function Login(props) {
     }
 
     if (valid) {
+      setInvalid(false);
+
       const result = await props.login(credentials);
       if (!result.err) {
         props.history.push("/");

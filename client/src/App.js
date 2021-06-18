@@ -14,7 +14,7 @@ import * as API from "./API";
 function App() {
   const [surveyList, setSurveyList] = useState([]);
   const [newSurvey, setNewSurvey] = useState({});
-  const [survey, setSurvey] = useState({});
+  const [survey, setSurvey] = useState(null);
 
   const [admin, setAdmin] = useState(null);
   const [dirty, setDirty] = useState(true);
@@ -123,16 +123,20 @@ function App() {
 
           <Route
             path="/survey"
-            render={(props) => (
-              <Survey
-                {...props}
-                surveyList={surveyList}
-                survey={survey}
-                // getSurvey={handleGetSurvey}
-                reply={handleReply}
-                retriveQuestions={handleGetQuestions}
-              />
-            )}
+            render={(props) =>
+              survey ? (
+                <Survey
+                  {...props}
+                  surveyList={surveyList}
+                  survey={survey}
+                  // getSurvey={handleGetSurvey}
+                  reply={handleReply}
+                  handleGetQuestions={handleGetQuestions}
+                />
+              ) : (
+                <Redirect to="/" />
+              )
+            }
           />
 
           <Route

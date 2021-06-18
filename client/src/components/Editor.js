@@ -26,8 +26,6 @@ function Editor(props) {
       setAlert("Insert at least one question");
       setValidated(false);
       return;
-    } else {
-      setValidated(true);
     }
 
     if (form.checkValidity()) {
@@ -41,6 +39,8 @@ function Editor(props) {
         setAlert(res.err);
       }
     }
+
+    setValidated(true);
   };
 
   const handleNewQuestion = (multipleChoice) => {
@@ -134,7 +134,7 @@ function Editor(props) {
             )}
 
             <Form noValidate validated={validated} onSubmit={handleSubmit}>
-              <Form.Group className="mb-3" controlId="formBasicEmail">
+              <Form.Group className="mb-3">
                 <Form.Label as="h4">Title</Form.Label>
                 <Form.Control
                   required
@@ -203,6 +203,8 @@ function Question(props) {
       <Col>
         <Form.Label>Optional</Form.Label>
         <Form.Check
+          custom
+          id={`custom-${props.id}`}
           type="checkbox"
           className="mt-2"
           label={props.optional?.toString()}

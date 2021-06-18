@@ -78,16 +78,57 @@ app.get("/api/surveys", async (_, res) => {
   }
 });
 
+// TODO Add validation
 app.get("/api/questions/:id", async (req, res) => {
   const id = req.params.id;
 
   try {
     const q = await surveyDao.getAllQuestions(id);
     const sorted = q.sort((a, b) => a.question_id - b.question_id);
+
     res.status(200).json(sorted);
   } catch {
     res.status(503).json({
       msg: "Database error during the retrive of questions.",
+    });
+  }
+});
+
+// TODO Add validation
+app.get("/api/admin/replies/:id", isLoggedIn, async (req, res) => {
+  if (!req.isAuthenticated()) {
+    res.status(401).json({ error: "Unauthenticated user!" });
+  }
+
+  const id = req.params.id;
+  // const admin = req.user;
+
+  try {
+    const q = await surveyDao.getAllReplies(id);
+    res.status(200).json(q);
+  } catch {
+    res.status(503).json({
+      msg: "Database error during the retrive of replies.",
+    });
+  }
+});
+
+// TODO Add validation
+app.post("/api/replies", async (req, res) => {
+  // const err = validationResult(req);
+  // if (!err.isEmpty()) {
+  //   return res.status(422).json({ errors: err.array() });
+  // }
+
+  const reply = req.body;
+
+  try {
+    await surveyDao.insertReply(reply);
+    res.status(200).end();
+  } catch (e) {
+    console.log(e);
+    res.status(503).json({
+      msg: "Database error during the creation of reply.",
     });
   }
 });
@@ -109,7 +150,7 @@ app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
   }
 });
 
-// TODO Add validation + Login
+// TODO Add validation
 app.post("/api/admin/surveys", isLoggedIn, async (req, res) => {
   if (!req.isAuthenticated()) {
     res.status(401).json({ error: "Unauthenticated user!" });
@@ -139,7 +180,7 @@ app.post("/api/admin/surveys", isLoggedIn, async (req, res) => {
     }
   } catch {
     res.status(503).json({
-      error: `Database error during creation of task`,
+      error: `Database error during creation of survey`,
     });
   }
 });

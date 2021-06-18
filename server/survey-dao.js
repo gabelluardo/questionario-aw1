@@ -38,6 +38,37 @@ exports.getAllQuestions = (id) => {
   });
 };
 
+exports.getAllReplies = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = "SELECT * FROM replies WHERE survey_id=?";
+    db.all(sql, [id], (err, rows) =>
+      err
+        ? reject(err)
+        : resolve(
+            rows.map((r) => {
+              const { survey_id, question_id, text, user } = r;
+              const choices = [
+                r.choice1,
+                r.choice2,
+                r.choice3,
+                r.choice4,
+                r.choice5,
+                r.choice6,
+                r.choice7,
+                r.choice8,
+                r.choice9,
+                r.choice10,
+              ]
+                .filter((c) => c !== null)
+                .map(Boolean);
+
+              return { survey_id, question_id, text, user, choices };
+            })
+          )
+    );
+  });
+};
+
 exports.getAdminSurvey = (admin) => {
   return new Promise((resolve, reject) => {
     const sql = "SELECT * FROM surveys WHERE admin=?";
@@ -47,7 +78,7 @@ exports.getAdminSurvey = (admin) => {
 
 exports.createSurvey = (survey, admin) => {
   return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO surveys(admin, adminStr, title, replies) VALUES(?, ?, ?, 0);`;
+    const sql = `INSERT INTO surveys(admin, adminStr, title, replies) VALUES(?, ?, ?, 0)`;
     db.run(sql, [admin.id, admin.username, survey.title], function (err) {
       err ? reject(err) : resolve(this.lastID);
     });
@@ -64,7 +95,7 @@ exports.deleteSurvey = (id) => {
 exports.insertQuestions = (questions, id) => {
   return new Promise((resolve, reject) => {
     const sql = `INSERT INTO questions(survey_id, text,  optional, min, max, choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8, choice9, choice10)
-    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const statement = db.prepare(sql, (err) =>
       err ? reject(err) : resolve(true)
@@ -79,5 +110,28 @@ exports.insertQuestions = (questions, id) => {
     );
 
     statement.finalize();
+  });
+};
+
+exports.insertReply = (replies) => {
+  return new Promise((resolve, reject) => {
+    const sql = `INSERT INTO replies(survey_id, question_id, user, text, choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8, choice9, choice10)
+    VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
+    const statement = db.prepare(sql, (err) => (err ? reject(err) : null));
+
+    db.serialize(() =>
+      replies.forEach((r) => {
+        const choices = r.choices || [];
+        statement.run([r.survey_id, r.question_id, r.user, r.text, ...choices]);
+      })
+    );
+
+    statement.finalize();
+
+    const inc = `UPDATE surveys SET replies = replies + 1 WHERE id=?`;
+    db.run(inc, [replies[0].survey_id], (err) =>
+      err ? reject(err) : resolve(null)
+    );
   });
 };

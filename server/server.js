@@ -2,7 +2,7 @@
 
 const express = require("express");
 const morgan = require("morgan");
-const { check, validationResult, body, oneOf } = require("express-validator"); // validation middleware
+const { check, validationResult, checkSchema } = require("express-validator"); // validation middleware
 
 const surveyDao = require("./survey-dao");
 const userDao = require("./user-dao");
@@ -122,44 +122,58 @@ app.get(
   }
 );
 
-app.post(
-  "/api/replies",
-  [
-    check("reply").isArray(),
-    check("reply.*.question_id").isInt(),
-    check("reply.*.user").isString(),
-    check("reply.*.survey_id").isInt(),
-    check("reply.*.text")
-      .isString()
-      .isLength({ max: 200 })
-      .notEmpty()
-      .if(body("reply.*.choices").exists())
-      .optional({ nullable: true }),
-    check("reply.*.choices")
-      .isArray({ max: 10 })
-      .notEmpty()
-      .if(body("reply.*.text").exists())
-      .optional({ nullable: true }),
-  ],
-  async (req, res) => {
-    const err = validationResult(req);
-    if (!err.isEmpty()) {
-      return res.status(422).json({ err: err.array() });
-    }
+const repliesSchema = {
+  reply: { isArray: true, notEmpty: true },
+  "reply.*.question_id": { isInt: true },
+  "reply.*.survey_id": { isInt: true },
+  "reply.*.user": { isString: true },
+  "reply.*.text": {
+    isString: true,
+    isLength: { min: 1, max: 200 },
+    optional: { options: { nullable: true } },
+    /* NOTE if there is an array of choices, `text` must be `null` */
+    custom: {
+      options: (value, { req, path }) => {
+        const pos = path.match(/\d+/)[0];
+        const c = req.body.reply[pos].choices;
 
-    const reply = req.body.reply;
+        return !(value && c);
+      },
+    },
+  },
+  "reply.*.choices": {
+    isArray: true,
+    isLength: { min: 1, max: 10 },
+    optional: { options: { nullable: true } },
+    /* NOTE if there is a text, `choices` must be `null` */
+    custom: {
+      options: (value, { req, path }) => {
+        const pos = path.match(/\d+/)[0];
+        const t = req.body.reply[pos].text;
 
-    try {
-      await surveyDao.insertReply(reply);
-      res.status(200).end();
-    } catch (e) {
-      console.log(e);
-      res.status(503).json({
-        msg: "Database error during the creation of reply.",
-      });
-    }
+        return !(value && t);
+      },
+    },
+  },
+};
+
+app.post("/api/replies", checkSchema(repliesSchema), async (req, res) => {
+  const err = validationResult(req);
+  if (!err.isEmpty()) {
+    return res.status(422).json({ err: err.array() });
   }
-);
+
+  const reply = req.body.reply;
+
+  try {
+    await surveyDao.insertReply(reply);
+    res.status(200).end();
+  } catch {
+    res.status(503).json({
+      msg: "Database error during the creation of reply.",
+    });
+  }
+});
 
 app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
   const admin = req.user;
@@ -174,36 +188,84 @@ app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
   }
 });
 
-// TODO Add validation
-app.post("/api/admin/surveys", isLoggedIn, async (req, res) => {
-  // const err = validationResult(req);
-  // if (!err.isEmpty()) {
-  //   return res.status(422).json({ err: err.array() });
-  // }
+const surveysSchema = {
+  title: { isString: true, notEmpty: true },
+  questions: { isArray: true, notEmpty: true },
 
-  const survey = req.body;
-  const admin = req.user;
+  "questions.*.text": { isString: true, notEmpty: true },
+  "questions.*.optional": {
+    isBoolean: true,
+    optional: { options: { nullable: true } },
+    /* NOTE if there is `choices`, `optional` must be `null` */
+    custom: {
+      options: (value, { req, path }) => {
+        const pos = path.match(/\d+/)[0];
+        const c = req.body.questions[pos].choices;
+        const v = value !== null;
 
-  try {
-    const lastID = await surveyDao.createSurvey(survey, admin);
-    const ok = await surveyDao
-      .insertQuestions(survey.questions, lastID)
-      // Rollback
-      .catch(() => {
-        surveyDao.deleteSurvey(lastID);
-      });
+        return !(v && c);
+      },
+    },
+  },
+  "questions.*.min": {
+    isInt: true,
+    optional: { options: { nullable: true } },
+  },
+  "questions.*.max": {
+    isInt: true,
+    optional: { options: { nullable: true } },
+  },
+  "questions.*.choices": {
+    isArray: true,
+    isLength: { min: 1, max: 10 },
+    optional: { options: { nullable: true } },
+    /* NOTE if there is `optional`, `choices` must be `null` */
+    custom: {
+      options: (value, { req, path }) => {
+        const pos = path.match(/\d+/)[0];
+        const opt = req.body.questions[pos].optional;
+        const o = opt !== null && opt !== undefined;
 
-    if (ok) {
-      res.status(200).end();
-    } else {
-      throw ok;
+        return !(value && o);
+      },
+    },
+  },
+};
+
+app.post(
+  "/api/admin/surveys",
+  isLoggedIn,
+  checkSchema(surveysSchema),
+  async (req, res) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+      return res.status(422).json({ err: err.array() });
     }
-  } catch {
-    res.status(503).json({
-      error: `Database error during creation of survey`,
-    });
+
+    const survey = req.body;
+    const admin = req.user;
+
+    try {
+      const lastID = await surveyDao.createSurvey(survey, admin);
+      const ok = await surveyDao
+        .insertQuestions(survey.questions, lastID)
+        // Rollback
+        .catch(() => {
+          surveyDao.deleteSurvey(lastID);
+        });
+
+      if (ok) {
+        res.status(200).end();
+      } else {
+        throw ok;
+      }
+    } catch {
+      res.status(503).json({
+        error: `Database error during creation of survey`,
+      });
+    }
   }
-});
+);
 
 /*** Users APIs ***/
 

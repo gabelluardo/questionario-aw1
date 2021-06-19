@@ -56,7 +56,7 @@ export async function createSurvey(s) {
   if (response.ok) {
     return null;
   } else {
-    throw response;
+    throw { err: "Server communication error" };
   }
 }
 
@@ -72,7 +72,8 @@ export async function sendReply(r) {
   if (response.ok) {
     return null;
   } else {
-    throw response;
+    console.log(await response.json());
+    throw { err: "Server communication error" };
   }
 }
 

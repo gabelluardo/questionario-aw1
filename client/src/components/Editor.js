@@ -235,7 +235,7 @@ function Question(props) {
           <Form.Control
             type="number"
             value={props.max}
-            min={props.min}
+            min={props.min || 1}
             max={10}
             onChange={(e) =>
               props.change(parseInt(e.target.value), props.id, "max")

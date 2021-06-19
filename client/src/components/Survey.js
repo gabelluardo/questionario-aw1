@@ -22,10 +22,10 @@ function Survey(props) {
           /* Retrive replies for this survey from server */
 
           const r = await props.handleGetReply(id);
-          const all = parseAllReplies(r);
-          const current = all[0];
+          if (r) {
+            const all = parseAllReplies(r);
+            const current = all[0];
 
-          if (all) {
             setReplies(current.replies);
             setUser(current.user);
             setAllReplies(all);
@@ -103,13 +103,13 @@ function Survey(props) {
         Object({
           text: r.text || null,
           question_id: r.id,
-          choices: r.choices,
+          choices: r.choices.length ? r.choices : null,
           user: user,
           survey_id: props.survey.id,
         })
       );
 
-      const res = await props.handleReply(reply);
+      const res = await props.handleReply({ reply: reply });
       if (!res.err) {
         return props.history.push("/");
       } else {

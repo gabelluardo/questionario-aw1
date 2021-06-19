@@ -59,7 +59,7 @@ function App() {
       setDirty(true);
       return true;
     } catch (e) {
-      return { err: e };
+      return e;
     }
   };
 
@@ -88,7 +88,7 @@ function App() {
       await API.sendReply(reply);
       return true;
     } catch (e) {
-      return { err: e };
+      return e;
     }
   };
 

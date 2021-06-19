@@ -56,7 +56,7 @@ export async function createSurvey(s) {
   if (response.ok) {
     return null;
   } else {
-    throw s;
+    throw response;
   }
 }
 
@@ -72,7 +72,7 @@ export async function sendReply(r) {
   if (response.ok) {
     return null;
   } else {
-    throw "Errore del server";
+    throw response;
   }
 }
 

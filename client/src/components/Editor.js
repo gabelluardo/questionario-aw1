@@ -30,7 +30,6 @@ function Editor(props) {
 
     if (form.checkValidity()) {
       const survey = { title: title, questions: questions };
-      console.log(survey);
 
       const res = await props.create(survey);
       if (!res.err) {

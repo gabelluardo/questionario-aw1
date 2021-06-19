@@ -92,8 +92,6 @@ function App() {
     }
   };
 
-  const handleGetSurvey = () => {};
-
   const handleGetQuestions = async (id) => {
     try {
       return await API.getQuestionsByID(id);

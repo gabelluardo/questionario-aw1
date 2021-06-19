@@ -9,7 +9,6 @@ import {
   ListGroup,
 } from "react-bootstrap";
 import { Link } from "react-router-dom";
-// import * as Icon from "react-bootstrap-icons";
 
 function Dashboard(props) {
   const [open, setOpen] = useState(false);

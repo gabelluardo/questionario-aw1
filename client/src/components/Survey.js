@@ -19,6 +19,8 @@ function Survey(props) {
         setQuestions(q);
 
         if (props.readOnly) {
+          /* Retrive replies for this survey from server */
+
           const r = await props.handleGetReply(id);
           const all = parseAllReplies(r);
           const current = all[0];
@@ -29,6 +31,8 @@ function Survey(props) {
             setAllReplies(all);
           }
         } else {
+          /* Create a default response object */
+
           const r = q.map((q) => ({
             isInvalid: null,
             id: q.question_id,
@@ -47,10 +51,11 @@ function Survey(props) {
     if (props.readOnly) {
       const r = allReplies[position];
       if (r) {
+        setUser(r.user);
         setReplies([...r.replies]);
       }
     }
-  }, [position]);
+  }, [position, allReplies, props.readOnly]);
 
   const customValidation = () => {
     const r = replies.map((r) => {
@@ -172,75 +177,43 @@ function Survey(props) {
 
             <Form noValidate onSubmit={handleSubmit}>
               {questions.map((q, k) => (
-                <Form.Group key={k} className="mb-3">
-                  <Question
-                    {...q}
-                    id={k}
-                    readOnly={props.readOnly}
-                    changeText={handleChangeText}
-                    changeCheck={handleChangeCheck}
-                    closed={q.optional == null}
-                    reply={replies[k]}
-                    radio={q.max === 1}
-                    validated={validated}
-                  />
-                </Form.Group>
+                <Question
+                  {...q}
+                  key={k}
+                  id={k}
+                  readOnly={props.readOnly}
+                  changeText={handleChangeText}
+                  changeCheck={handleChangeCheck}
+                  closed={q.optional == null}
+                  reply={replies[k]}
+                  radio={q.max === 1}
+                  validated={validated}
+                />
               ))}
-              <Form.Group as={Row} className="pb-1 justify-content-end">
-                <Col sm={4}>
-                  <Form.Label as="h4">Sign</Form.Label>
-                  <Form.Control
-                    required
-                    readOnly={props.readOnly}
-                    type="text"
-                    placeholder="Enter Your Name"
-                    value={user}
-                    isInvalid={!user.length && validated}
-                    isValid={user.length && validated}
-                    onChange={(e) => setUser(e.target.value)}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    Please sign this survey reply!
-                  </Form.Control.Feedback>
-                </Col>
-              </Form.Group>
-              {/* <hr /> */}
-              {!questions.length || props.readOnly ? null : (
-                <Row className="d-flex justify-content-end pt-2">
-                  <Button
-                    className="mx-3"
-                    variant="secondary"
-                    onClick={() => props.history.push("/")}
-                    // onClick={() => setValidated(false)}
-                  >
-                    Cancel
-                  </Button>
-                  <Button className="mr-3" variant="success" type="submit">
-                    Send
-                  </Button>
-                </Row>
-              )}
+
+              <Sign
+                {...props}
+                show={questions.length}
+                user={user}
+                setUser={setUser}
+                validated={validated}
+              />
+
+              <ActionButtons
+                {...props}
+                show={!props.readOnly && questions.length}
+              />
             </Form>
           </Col>
         </Row>
-        {!props.readOnly ? null : (
-          <Row className="d-flex justify-content-between pt-5">
-            {!position ? null : (
-              <Icon.ArrowReturnLeft
-                size={32}
-                className="icon-action mr-auto"
-                onClick={() => setPosition((p) => p - 1)}
-              />
-            )}
-            {position === replies.length ? null : (
-              <Icon.ArrowReturnRight
-                size={32}
-                className="icon-action ml-auto"
-                onClick={() => setPosition((p) => p + 1)}
-              />
-            )}
-          </Row>
-        )}
+
+        <Navigation
+          {...props}
+          show={props.readOnly && allReplies.length > 1}
+          first={position === 0}
+          last={position === allReplies.length - 1}
+          setPosition={setPosition}
+        />
       </Col>
     </Row>
   );
@@ -317,7 +290,7 @@ function Question(props) {
   );
 
   return (
-    <Form.Group className="my-4">
+    <Form.Group className="my-4 mb-3">
       <Form.Row>
         <Col>
           <Form.Label as="h4" className="text-wrap">
@@ -325,7 +298,7 @@ function Question(props) {
           </Form.Label>
         </Col>
         <Col sm={3}>
-          <Info
+          <QuestionInfo
             {...props}
             warning={props.reply?.text?.length > 200}
             char={props.reply?.text?.length}
@@ -338,8 +311,8 @@ function Question(props) {
   );
 }
 
-function Info(props) {
-  const openedType = `(${200 - props.char} characters)`;
+function QuestionInfo(props) {
+  const openedType = `(${200 - props.char || 200} characters left)`;
   const closedType = `(min: ${props.min}; max: ${props.max})`;
   const textType = `text-${props.warning ? `danger` : `muted`}`;
 
@@ -347,6 +320,67 @@ function Info(props) {
     <p className={`${textType} pt-1`}>
       {props.closed ? closedType : openedType}
     </p>
+  );
+}
+
+function Sign(props) {
+  return !props.show ? null : (
+    <Form.Group as={Row} className="pb-1 justify-content-end">
+      <Col sm={4}>
+        <Form.Label as="h4">Sign</Form.Label>
+        <Form.Control
+          required
+          readOnly={props.readOnly}
+          type="text"
+          placeholder="Enter Your Name"
+          value={props.user}
+          isInvalid={!props.user.length && props.validated}
+          isValid={props.user.length && props.validated}
+          onChange={(e) => props.setUser(e.target.value)}
+        />
+        <Form.Control.Feedback type="invalid">
+          Please sign this survey reply!
+        </Form.Control.Feedback>
+      </Col>
+    </Form.Group>
+  );
+}
+
+function ActionButtons(props) {
+  return !props.show ? null : (
+    <Row className="d-flex justify-content-end pt-2">
+      <Button
+        className="mx-3"
+        variant="secondary"
+        onClick={() => props.history.push("/")}
+      >
+        Cancel
+      </Button>
+      <Button className="mr-3" variant="success" type="submit">
+        Send
+      </Button>
+    </Row>
+  );
+}
+
+function Navigation(props) {
+  return !props.show ? null : (
+    <Row className="pt-5">
+      {props.first ? null : (
+        <Icon.ArrowReturnLeft
+          size={32}
+          className="icon-action mr-auto"
+          onClick={() => props.setPosition((p) => p - 1)}
+        />
+      )}
+      {props.last ? null : (
+        <Icon.ArrowReturnRight
+          size={32}
+          className="icon-action ml-auto"
+          onClick={() => props.setPosition((p) => p + 1)}
+        />
+      )}
+    </Row>
   );
 }
 

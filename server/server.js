@@ -51,7 +51,7 @@ app.use(express.json());
 const isLoggedIn = (req, res, next) => {
   if (req.isAuthenticated()) return next();
 
-  return res.status(401).json({ error: "not authenticated" });
+  return res.status(401).json({ err: "not authenticated" });
 };
 
 app.use(
@@ -78,8 +78,12 @@ app.get("/api/surveys", async (_, res) => {
   }
 });
 
-// TODO Add validation
-app.get("/api/questions/:id", async (req, res) => {
+app.get("/api/questions/:id", [check("id").isInt()], async (req, res) => {
+  const err = validationResult(req);
+  if (!err.isEmpty()) {
+    return res.status(422).json({ err: err.array() });
+  }
+
   const id = req.params.id;
 
   try {
@@ -94,50 +98,70 @@ app.get("/api/questions/:id", async (req, res) => {
   }
 });
 
-// TODO Add validation
-app.get("/api/admin/replies/:id", isLoggedIn, async (req, res) => {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Unauthenticated user!" });
+app.get(
+  "/api/admin/replies/:survey_id",
+  isLoggedIn,
+  [check("survey_id").isInt()],
+  async (req, res) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+      return res.status(422).json({ err: err.array() });
+    }
+
+    const id = req.params.survey_id;
+    const admin = req.user;
+
+    try {
+      const q = await surveyDao.getAllReplies(id, admin);
+      res.status(200).json(q);
+    } catch {
+      res.status(503).json({
+        msg: "Database error during the retrive of replies.",
+      });
+    }
   }
+);
 
-  const id = req.params.id;
-  // const admin = req.user;
+app.post(
+  "/api/replies",
+  [
+    check("reply").isArray(),
+    check("reply.*.question_id").isInt(),
+    check("reply.*.user").isString(),
+    check("reply.*.survey_id").isInt(),
+    check("reply.*.text")
+      .isString()
+      .isLength({ max: 200 })
+      .notEmpty()
+      .if(body("reply.*.choices").exists())
+      .optional({ nullable: true }),
+    check("reply.*.choices")
+      .isArray({ max: 10 })
+      .notEmpty()
+      .if(body("reply.*.text").exists())
+      .optional({ nullable: true }),
+  ],
+  async (req, res) => {
+    const err = validationResult(req);
+    if (!err.isEmpty()) {
+      return res.status(422).json({ err: err.array() });
+    }
 
-  try {
-    const q = await surveyDao.getAllReplies(id);
-    res.status(200).json(q);
-  } catch {
-    res.status(503).json({
-      msg: "Database error during the retrive of replies.",
-    });
+    const reply = req.body.reply;
+
+    try {
+      await surveyDao.insertReply(reply);
+      res.status(200).end();
+    } catch (e) {
+      console.log(e);
+      res.status(503).json({
+        msg: "Database error during the creation of reply.",
+      });
+    }
   }
-});
-
-// TODO Add validation
-app.post("/api/replies", async (req, res) => {
-  // const err = validationResult(req);
-  // if (!err.isEmpty()) {
-  //   return res.status(422).json({ errors: err.array() });
-  // }
-
-  const reply = req.body;
-
-  try {
-    await surveyDao.insertReply(reply);
-    res.status(200).end();
-  } catch (e) {
-    console.log(e);
-    res.status(503).json({
-      msg: "Database error during the creation of reply.",
-    });
-  }
-});
+);
 
 app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Unauthenticated user!" });
-  }
-
   const admin = req.user;
 
   try {
@@ -152,13 +176,9 @@ app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
 
 // TODO Add validation
 app.post("/api/admin/surveys", isLoggedIn, async (req, res) => {
-  if (!req.isAuthenticated()) {
-    res.status(401).json({ error: "Unauthenticated user!" });
-  }
-
   // const err = validationResult(req);
   // if (!err.isEmpty()) {
-  //   return res.status(422).json({ errors: err.array() });
+  //   return res.status(422).json({ err: err.array() });
   // }
 
   const survey = req.body;

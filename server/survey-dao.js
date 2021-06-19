@@ -38,10 +38,15 @@ exports.getAllQuestions = (id) => {
   });
 };
 
-exports.getAllReplies = (id) => {
+exports.getAllReplies = (id, admin) => {
   return new Promise((resolve, reject) => {
-    const sql = "SELECT * FROM replies WHERE survey_id=?";
-    db.all(sql, [id], (err, rows) =>
+    /* An admin can only view replies from his survey */
+    const sql = `SELECT * 
+                  FROM    replies AS R, surveys AS S 
+                  WHERE   R.survey_id == S.id
+                  AND     R.survey_id=? AND S.admin=?`;
+
+    db.all(sql, [id, admin.id], (err, rows) =>
       err
         ? reject(err)
         : resolve(

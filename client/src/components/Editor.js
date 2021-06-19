@@ -156,7 +156,7 @@ function Editor(props) {
                   delete={handleDelete}
                   position={handleChangePosition}
                   addChoice={handleAddChoice}
-                  // porps for arrow view
+                  // props for arrow view
                   last={k === questions.length - 1}
                   first={k === 0}
                 />

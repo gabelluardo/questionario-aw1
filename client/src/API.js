@@ -56,7 +56,8 @@ export async function createSurvey(s) {
   if (response.ok) {
     return null;
   } else {
-    throw { err: "Server communication error" };
+    const msg = await response.json();
+    throw { err: "Server communication error", msg: msg };
   }
 }
 
@@ -72,8 +73,8 @@ export async function sendReply(r) {
   if (response.ok) {
     return null;
   } else {
-    console.log(await response.json());
-    throw { err: "Server communication error" };
+    const msg = await response.json();
+    throw { err: "Server communication error", msg: msg };
   }
 }
 

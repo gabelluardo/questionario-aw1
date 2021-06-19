@@ -11,7 +11,7 @@ import {
 import * as Icon from "react-bootstrap-icons";
 
 function Login(props) {
-  // NOTE Valid default credentials for easy testing
+  // NOTE valid default credentials for easy testing
   const [email, setEmail] = useState("admin1@polito.it");
   const [password, setPassword] = useState("passadmin1");
 

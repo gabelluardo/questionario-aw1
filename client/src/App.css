@@ -1,14 +1,12 @@
 @import "bootstrap/dist/css/bootstrap.min.css";
 
 :root {
+  /* Custom color palette */
   --black-shadows: #baa7b0;
   --heliotrope-gray: #b2abbf;
   --cadet-blue-crayola: #b1b5c8;
   --beau-blue: #bfd5e2;
   --powder-blue: #c7ebf0;
-
-  /* Text color */
-  --xiketic: #0d0221;
 }
 
 /* General  */
@@ -23,27 +21,6 @@
 
 /* CSS for components */
 
-/* Sidebar */
-
-/* .sidebar-profile {
-  background-color: green;
-  color: white;
-} */
-
-/* .sidebar-router {
-  background-color: darkblue;
-  background-color: #fff;
-  color: white;
-  min-width: 20%;
-} */
-
-/* Main component view */
-
-/* .view {
-  background-color: pink;
-  background-color: #f5f7fb;
-}*/
-
 .view-title {
   /* background-color: burlywood; */
   text-decoration: underline;
@@ -56,12 +33,6 @@
   top: 10px;
   right: 20px;
   z-index: 1;
-}
-
-
-/* Login */
-.login-form {
-  max-width: 600px;
 }
 
 /* Bootstrap custom */

@@ -261,7 +261,7 @@ app.post(
       }
     } catch {
       res.status(503).json({
-        error: `Database error during creation of survey`,
+        error: `Database error during the creation of survey.`,
       });
     }
   }

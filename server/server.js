@@ -60,6 +60,10 @@ app.use(
     secret: "secret sentence not to be shared",
     resave: false,
     saveUninitialized: false,
+    // NOTE this fix a firefox warning for cookies
+    cookie: {
+      sameSite: "strict",
+    },
   })
 );
 
@@ -146,7 +150,7 @@ const repliesSchema = {
     isArray: true,
     isLength: { min: 1, max: 10 },
     optional: { options: { nullable: true } },
-    /* NOTE if there is a text, `choices` must be `null` */
+    /* NOTE if there is `text`, `choices` must be `null` */
     custom: {
       options: (value, { req, path }) => {
         const pos = path.match(/\d+/)[0];

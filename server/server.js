@@ -15,10 +15,11 @@ const LocalStrategy = require("passport-local").Strategy;
 passport.use(
   new LocalStrategy(function (username, password, done) {
     userDao.getUser(username, password).then((user) => {
-      if (!user)
+      if (!user) {
         return done(null, false, {
           message: "Incorrect username or password.",
         });
+      }
 
       return done(null, user);
     });

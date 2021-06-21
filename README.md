@@ -10,10 +10,10 @@
 - ...
 -->
 
-- Route `/`: `Dashboard` that shows avaible surveys ready for compilation; if logged as admin, it shows published surveys and number of compilation for each one
-- Route `/editor`: `Editor` for surveys creation, this is avaible only for authenticated admins
+- Route `/`: `Dashboard` that shows available surveys ready for compilation; if logged as admin, it shows published surveys and number of compilation for each one
+- Route `/editor`: `Editor` for surveys creation, this is available only for authenticated admins
 - Route `/login`: `Login` shows the login form
-- Route `/surveys`: `Surveys` shows forms for surveys compliation, this is avaible all users without authentication; if logged as admin shows the replies for selected survey
+- Route `/surveys`: `Surveys` shows forms for surveys compilation, this is available all users without authentication; if logged as admin shows the replies for selected survey
 
 ## API Server
 
@@ -381,7 +381,7 @@ _fields with `*` are the primary keys_
 (only _main_ components, minor ones may be skipped)
 -->
 
-- `Dashboard` (in `components/Dashboard.js`): shows a list of surveys (all avaible ones for common users, only own ones for admins); manages creation of new surveys and redirections for proper route (`/editor` for new survey creation, or `/survey` for survey compilation)
+- `Dashboard` (in `components/Dashboard.js`): shows a list of surveys (all available ones for common users, only own ones for admins); manages creation of new surveys and redirections for proper route (`/editor` for new survey creation, or `/survey` for survey compilation)
 - `Editor` (in `components/Editor.js`): shows and validates forms for new survey creation; manages requested events such as creation/delete of new questions and position changes of questions; calls survey creation server api.
 - `Login` (in `components/Login.js`): shows and validates forms for admin authentication and calls login server api.
 - `Navbar` (in `components/Navbar.js`): shows the brand and the name of the application, and the profile icon which handle login and logout events.

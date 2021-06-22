@@ -315,7 +315,7 @@ function Question(props) {
 
 function QuestionInfo(props) {
   const openedType = `(${!props.optional ? "mandatory, " : ""}${
-    200 - props.char || 200
+    200 - (props.char || 0)
   } characters left)`;
   const closedType = `(min: ${props.min}; max: ${props.max})`;
   const textType = `text-${props.warning ? `danger` : `muted`}`;

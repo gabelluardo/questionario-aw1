@@ -110,7 +110,10 @@ exports.insertQuestions = (questions, id) => {
     db.serialize(() =>
       questions.forEach((q) => {
         const choices = q.choices || [];
-        statement.run([id, q.text, q.optional, q.min, q.max, ...choices]);
+        statement.run(
+          [id, q.text, q.optional, q.min, q.max, ...choices],
+          (err) => (err ? reject(err) : null)
+        );
       })
     );
 
@@ -128,7 +131,10 @@ exports.insertReply = (replies) => {
     db.serialize(() =>
       replies.forEach((r) => {
         const choices = r.choices || [];
-        statement.run([r.survey_id, r.question_id, r.user, r.text, ...choices]);
+        statement.run(
+          [r.survey_id, r.question_id, r.user, r.text, ...choices],
+          (err) => (err ? reject(err) : null)
+        );
       })
     );
 

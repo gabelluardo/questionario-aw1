@@ -131,10 +131,13 @@ const repliesSchema = {
   reply: { isArray: true, notEmpty: true },
   "reply.*.question_id": { isInt: true },
   "reply.*.survey_id": { isInt: true },
-  "reply.*.user": { isString: true },
+  "reply.*.user": {
+    isString: true,
+    isLength: { options: { min: 1, max: 200 } },
+  },
   "reply.*.text": {
     isString: true,
-    isLength: { min: 1, max: 200 },
+    isLength: { options: { min: 1, max: 200 } },
     optional: { options: { nullable: true } },
     /* NOTE if there is an array of choices, `text` must be `null` */
     custom: {
@@ -148,7 +151,7 @@ const repliesSchema = {
   },
   "reply.*.choices": {
     isArray: true,
-    isLength: { min: 1, max: 10 },
+    isLength: { options: { min: 1, max: 10 } },
     optional: { options: { nullable: true } },
     /* NOTE if there is `text`, `choices` must be `null` */
     custom: {
@@ -194,10 +197,18 @@ app.get("/api/admin/surveys", isLoggedIn, async (req, res) => {
 });
 
 const surveysSchema = {
-  title: { isString: true, notEmpty: true },
+  title: {
+    isString: true,
+    isLength: { options: { min: 1, max: 200 } },
+    notEmpty: true,
+  },
   questions: { isArray: true, notEmpty: true },
 
-  "questions.*.text": { isString: true, notEmpty: true },
+  "questions.*.text": {
+    isString: true,
+    isLength: { options: { min: 1, max: 200 } },
+    notEmpty: true,
+  },
   "questions.*.optional": {
     isBoolean: true,
     optional: { options: { nullable: true } },
@@ -213,16 +224,40 @@ const surveysSchema = {
     },
   },
   "questions.*.min": {
-    isInt: true,
+    isInt: { min: 0, max: 10 },
     optional: { options: { nullable: true } },
+    custom: {
+      options: (min, { req, path }) => {
+        const pos = path.match(/\d+/)[0];
+        const max = req.body.questions[pos].max;
+
+        if (min !== null && max !== null) {
+          return max >= min;
+        } else {
+          return min === null && max === null;
+        }
+      },
+    },
   },
   "questions.*.max": {
-    isInt: true,
+    isInt: { min: 1, max: 10 },
     optional: { options: { nullable: true } },
+    custom: {
+      options: (max, { req, path }) => {
+        const pos = path.match(/\d+/)[0];
+        const min = req.body.questions[pos].min;
+
+        if (min !== null && max !== null) {
+          return max >= min;
+        } else {
+          return min === null && max === null;
+        }
+      },
+    },
   },
   "questions.*.choices": {
     isArray: true,
-    isLength: { min: 1, max: 10 },
+    isLength: { options: { min: 1, max: 10 } },
     optional: { options: { nullable: true } },
     /* NOTE if there is `optional`, `choices` must be `null` */
     custom: {

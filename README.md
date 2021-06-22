@@ -13,7 +13,7 @@
 - Route `/`: `Dashboard` that shows available surveys ready for compilation; if logged as admin, it shows published surveys and number of compilation for each one
 - Route `/editor`: `Editor` for surveys creation, this is available only for authenticated admins
 - Route `/login`: `Login` shows the login form
-- Route `/surveys`: `Surveys` shows forms for surveys compilation, this is available all users without authentication; if logged as admin shows the replies for selected survey
+- Route `/surveys`: `Surveys` shows forms for surveys compilation, this is available for all users without authentication; if logged as admin shows the replies for selected survey
 
 ## API Server
 

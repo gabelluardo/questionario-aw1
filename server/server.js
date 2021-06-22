@@ -174,11 +174,19 @@ app.post("/api/replies", checkSchema(repliesSchema), async (req, res) => {
   const reply = req.body.reply;
 
   try {
-    await surveyDao.insertReply(reply);
-    res.status(200).end();
+    const ok = await surveyDao.insertReply(reply);
+
+    if (ok) {
+      const surveyID = reply[0].survey_id;
+      await surveyDao.incrementReplies(surveyID);
+      res.status(200).end();
+    } else {
+      throw ok;
+    }
   } catch {
+    const user = reply[0].user;
     res.status(503).json({
-      msg: "Database error during the creation of reply.",
+      msg: `${user} already filled out this survey.`,
     });
   }
 });

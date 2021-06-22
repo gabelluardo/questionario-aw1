@@ -113,7 +113,7 @@ function Survey(props) {
       if (!res.err) {
         return props.history.push("/");
       } else {
-        setAlert(res.err);
+        setAlert(res.msg);
         setValidated(false);
       }
     }
@@ -294,16 +294,18 @@ function Question(props) {
       <Form.Row>
         <Col>
           <Form.Label as="h4" className="text-wrap">
-            {props.id + 1}. {props.text}{" "}
+            {props.id + 1}. {props.text}
           </Form.Label>
         </Col>
-        <Col sm={3}>
-          <QuestionInfo
-            {...props}
-            warning={props.reply?.text?.length > 200}
-            char={props.reply?.text?.length}
-          />
-        </Col>
+        {/* <Col > */}
+        <QuestionInfo
+          className="ml-auto"
+          {...props}
+          optional={props.optional}
+          warning={props.reply?.text?.length > 200}
+          char={props.reply?.text?.length}
+        />
+        {/* </Col> */}
       </Form.Row>
       {props.closed ? closedType : openedType}
       <hr />
@@ -312,7 +314,9 @@ function Question(props) {
 }
 
 function QuestionInfo(props) {
-  const openedType = `(${200 - props.char || 200} characters left)`;
+  const openedType = `(${!props.optional ? "mandatory, " : ""}${
+    200 - props.char || 200
+  } characters left)`;
   const closedType = `(min: ${props.min}; max: ${props.max})`;
   const textType = `text-${props.warning ? `danger` : `muted`}`;
 

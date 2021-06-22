@@ -102,9 +102,7 @@ exports.insertQuestions = (questions, id) => {
     const sql = `INSERT INTO questions(survey_id, text,  optional, min, max, choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8, choice9, choice10)
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
-    const statement = db.prepare(sql, (err) =>
-      err ? reject(err) : resolve(true)
-    );
+    const statement = db.prepare(sql, (err) => (err ? reject(err) : null));
 
     // All rows are inserted in order
     db.serialize(() =>
@@ -117,13 +115,13 @@ exports.insertQuestions = (questions, id) => {
       })
     );
 
-    statement.finalize();
+    statement.finalize((err) => (err ? reject(err) : resolve(true)));
   });
 };
 
 exports.insertReply = (replies) => {
   return new Promise((resolve, reject) => {
-    const sql = `INSERT INTO replies(survey_id, question_id, user, text, choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8, choice9, choice10)
+    const sql = `INSERT or FAIL INTO replies(survey_id, question_id, user, text, choice1, choice2, choice3, choice4, choice5, choice6, choice7, choice8, choice9, choice10)
     VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
 
     const statement = db.prepare(sql, (err) => (err ? reject(err) : null));
@@ -138,11 +136,13 @@ exports.insertReply = (replies) => {
       })
     );
 
-    statement.finalize();
+    statement.finalize((err) => (err ? reject(err) : resolve(true)));
+  });
+};
 
-    const inc = `UPDATE surveys SET replies = replies + 1 WHERE id=?`;
-    db.run(inc, [replies[0].survey_id], (err) =>
-      err ? reject(err) : resolve(null)
-    );
+exports.incrementReplies = (id) => {
+  return new Promise((resolve, reject) => {
+    const sql = `UPDATE surveys SET replies = replies + 1 WHERE id=?`;
+    db.run(sql, [id], (err) => (err ? reject(err) : resolve(null)));
   });
 };

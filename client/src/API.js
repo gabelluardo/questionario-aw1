@@ -57,8 +57,8 @@ export async function createSurvey(s) {
     return null;
   } else {
     const err = {
+      ...(await response.json()),
       err: "Server communication error",
-      msg: await response.json(),
     };
     throw err;
   }
@@ -77,8 +77,8 @@ export async function sendReply(r) {
     return null;
   } else {
     const err = {
+      ...(await response.json()),
       err: "Server communication error",
-      msg: await response.json(),
     };
     throw err;
   }

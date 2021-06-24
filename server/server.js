@@ -150,8 +150,7 @@ const repliesSchema = {
     },
   },
   "reply.*.choices": {
-    isArray: true,
-    isLength: { options: { min: 1, max: 10 } },
+    isArray: { options: { min: 1, max: 10 } },
     optional: { options: { nullable: true } },
     /* NOTE if there is `text`, `choices` must be `null` */
     custom: {
@@ -232,7 +231,7 @@ const surveysSchema = {
     },
   },
   "questions.*.min": {
-    isInt: { min: 0, max: 10 },
+    isInt: { options: { min: 1, max: 10 } },
     optional: { options: { nullable: true } },
     custom: {
       options: (min, { req, path }) => {
@@ -248,7 +247,7 @@ const surveysSchema = {
     },
   },
   "questions.*.max": {
-    isInt: { min: 1, max: 10 },
+    isInt: { options: { min: 1, max: 10 } },
     optional: { options: { nullable: true } },
     custom: {
       options: (max, { req, path }) => {
@@ -264,8 +263,7 @@ const surveysSchema = {
     },
   },
   "questions.*.choices": {
-    isArray: true,
-    isLength: { options: { min: 1, max: 10 } },
+    isArray: { options: { min: 1, max: 10 } },
     optional: { options: { nullable: true } },
     /* NOTE if there is `optional`, `choices` must be `null` */
     custom: {
@@ -287,6 +285,7 @@ app.post(
   async (req, res) => {
     const err = validationResult(req);
     if (!err.isEmpty()) {
+      console.log(err.array());
       return res.status(422).json({ err: err.array() });
     }
 

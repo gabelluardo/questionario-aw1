@@ -231,7 +231,7 @@ const surveysSchema = {
     },
   },
   "questions.*.min": {
-    isInt: { options: { min: 1, max: 10 } },
+    isInt: { options: { min: 0, max: 10 } },
     optional: { options: { nullable: true } },
     custom: {
       options: (min, { req, path }) => {

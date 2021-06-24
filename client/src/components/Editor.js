@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Alert,
   Button,
@@ -16,6 +16,10 @@ function Editor(props) {
 
   const [validated, setValidated] = useState(false);
   const [alert, setAlert] = useState(null);
+
+  useEffect(() => {
+    setValidated(false);
+  }, [questions.length]);
 
   const handleSubmit = async (e) => {
     const form = e.currentTarget;

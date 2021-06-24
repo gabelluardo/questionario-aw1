@@ -46,8 +46,8 @@ function Dashboard(props) {
               </Card.Header>
               <Card.Body>
                 <Card.Text className="text-muted">
-                  These are {props.user ? "results for your" : "all"} published
-                  surveys
+                  These are {props.user ? "the results for your" : "all the"}{" "}
+                  published surveys
                 </Card.Text>
                 <ListGroup variant="flush">
                   {props.list.map((s, k) => (

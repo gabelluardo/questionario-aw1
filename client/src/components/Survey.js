@@ -240,7 +240,7 @@ function Question(props) {
         />
         <Form.Control.Feedback type="invalid">
           {!(props.reply?.text?.length > 200)
-            ? "This answer is mandatory!"
+            ? "This question is mandatory!"
             : "This answer must have almost 200 characters!"}
         </Form.Control.Feedback>
       </Col>
@@ -343,7 +343,7 @@ function Sign(props) {
           onChange={(e) => props.setUser(e.target.value)}
         />
         <Form.Control.Feedback type="invalid">
-          Please sign this survey reply!
+          Please sign this survey reply
         </Form.Control.Feedback>
       </Col>
     </Form.Group>

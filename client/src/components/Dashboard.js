@@ -15,7 +15,7 @@ function Dashboard(props) {
 
   return (
     <Row className="vheight-100">
-      <Col className="px-5 py-4 mt-5">
+      <Col className="px-5 py-5">
         <Row className="mx-auto">
           <h1 className="view-title my-auto mr-auto">
             <b>Dashboard</b>

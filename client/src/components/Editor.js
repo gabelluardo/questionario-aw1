@@ -93,7 +93,7 @@ function Editor(props) {
 
   return (
     <Row className="vheight-100">
-      <Col className="px-5 py-4 mt-5">
+      <Col className="p-5">
         <Row className="mx-auto">
           <h1 className="view-title">
             <b>Survey editor</b>

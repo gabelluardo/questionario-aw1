@@ -50,14 +50,14 @@ function Login(props) {
 
   return (
     <Row className="vheight-100">
-      <Col className="px-5 py-4 mt-5">
+      <Col className="p-5">
         <Row className="mx-auto">
           <h1 className="view-title my-auto mr-auto">
             <b>Login</b>
           </h1>
         </Row>
-        <Row className="align-items-center">
-          <Col lg={6} md={10} className="mx-auto pt-4">
+        <Row className="align-items-center pt-5">
+          <Col lg={6} md={10} className="mx-auto">
             <Card>
               <Card.Body>
                 {!fail ? null : (

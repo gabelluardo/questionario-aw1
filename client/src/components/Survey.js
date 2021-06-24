@@ -153,7 +153,7 @@ function Survey(props) {
 
   return (
     <Row className="vheight-100">
-      <Col className="px-5 py-4 mt-5">
+      <Col className="p-5">
         <Row className="mx-auto view-title d-flex justify-content-between">
           <h1>
             <b>Survey</b>
@@ -390,7 +390,7 @@ function Navigation(props) {
           )}
         </Row>
       )}
-      <Row className={props.showNav ? "pt-3" : "pt-5"}>
+      <Row className={props.showNav ? "pt-1" : "pt-4"}>
         <Icon.House
           size={32}
           className="icon-action mx-auto"

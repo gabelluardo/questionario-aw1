@@ -378,7 +378,7 @@ function ActionButtons(props) {
 
 function Navigation(props) {
   return !props.show ? null : (
-    <div className="pt-5">
+    <div className="pt-4">
       <hr />
 
       {!props.showNav ? null : (

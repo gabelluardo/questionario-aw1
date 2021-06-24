@@ -141,8 +141,6 @@ function Survey(props) {
     }
     r.choices[i] = value;
 
-    console.log(r.choices);
-
     const q = questions.find((q) => q.question_id === r.id);
     const c = r.choices.filter(Boolean).length;
     r.isInvalid = !(c <= q.max && c >= q.min);
@@ -236,13 +234,13 @@ function Question(props) {
           char={props.reply?.text?.length}
         />
       </Form.Row>
-      {props.closed ? <MultipleChoice {...props} /> : <OpenHanded {...props} />}
+      {props.closed ? <MultipleChoice {...props} /> : <OpenEnded {...props} />}
       <hr />
     </Form.Group>
   );
 }
 
-function OpenHanded(props) {
+function OpenEnded(props) {
   return (
     <Row className="pt-2">
       <Col>

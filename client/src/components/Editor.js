@@ -108,7 +108,7 @@ function Editor(props) {
               variant="outline-light"
               onClick={() => handleNewQuestion(false)}
             >
-              Open-ended
+              Open ended
             </Dropdown.Item>
             <Dropdown.Item
               as={Button}
@@ -184,7 +184,41 @@ function Editor(props) {
 }
 
 function Question(props) {
-  const openedType = (
+  return (
+    <Form.Group className="my-4">
+      <hr />
+
+      <Form.Label as="h4">
+        Question {props.id + 1}
+        <span className="ml-3">
+          {props.last ? null : (
+            <Icon.ChevronDoubleDown
+              size={16}
+              className="mr-1 icon-action"
+              onClick={() => props.position(props.id, props.id + 1)}
+            />
+          )}
+          {props.first ? null : (
+            <Icon.ChevronDoubleUp
+              size={16}
+              className="mr-1 icon-action"
+              onClick={() => props.position(props.id, props.id - 1)}
+            />
+          )}
+          <Icon.Trash
+            size={16}
+            className="mr-1 icon-action"
+            onClick={() => props.delete(props.id)}
+          />
+        </span>
+      </Form.Label>
+      {props.choices ? <MultipleChoice {...props} /> : <OpenEnded {...props} />}
+    </Form.Group>
+  );
+}
+
+function OpenEnded(props) {
+  return (
     <Row>
       <Col sm={8}>
         <Form.Label>Text</Form.Label>
@@ -213,8 +247,10 @@ function Question(props) {
       </Col>
     </Row>
   );
+}
 
-  const closedType = (
+function MultipleChoice(props) {
+  return (
     <>
       <Row>
         <Col sm={8}>
@@ -259,11 +295,13 @@ function Question(props) {
         <Col>
           <Form.Label className="pb-2">
             Choices
-            <Icon.PlusSquare
-              size={20}
-              className="ml-2 icon-action"
-              onClick={() => props.addChoice(props.id)}
-            />
+            {props.choices?.length >= 10 ? null : (
+              <Icon.PlusSquare
+                size={20}
+                className="ml-3 icon-action"
+                onClick={() => props.addChoice(props.id)}
+              />
+            )}
           </Form.Label>
           {props.choices?.map((c, k) => (
             <Row key={k}>
@@ -293,38 +331,6 @@ function Question(props) {
         </Col>
       </Row>
     </>
-  );
-
-  return (
-    <Form.Group className="my-4">
-      <hr />
-
-      <Form.Label as="h4">
-        Question {props.id + 1}
-        <span className="ml-3">
-          {props.last ? null : (
-            <Icon.ChevronDoubleDown
-              size={16}
-              className="mr-1 icon-action"
-              onClick={() => props.position(props.id, props.id + 1)}
-            />
-          )}
-          {props.first ? null : (
-            <Icon.ChevronDoubleUp
-              size={16}
-              className="mr-1 icon-action"
-              onClick={() => props.position(props.id, props.id - 1)}
-            />
-          )}
-          <Icon.Trash
-            size={16}
-            className="mr-1 icon-action"
-            onClick={() => props.delete(props.id)}
-          />
-        </span>
-      </Form.Label>
-      {props.choices ? closedType : openedType}
-    </Form.Group>
   );
 }
 

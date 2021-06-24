@@ -137,11 +137,11 @@ function Survey(props) {
     const r = replies[key];
 
     if (radio) {
-      const c = r.choices;
-      r.choices = c.map((_, k) => (k !== i ? false : true));
-    } else {
-      r.choices[i] = value;
+      r.choices = r.choices.map(() => false);
     }
+    r.choices[i] = value;
+
+    console.log(r.choices);
 
     const q = questions.find((q) => q.question_id === r.id);
     const c = r.choices.filter(Boolean).length;
@@ -186,7 +186,7 @@ function Survey(props) {
                   changeCheck={handleChangeCheck}
                   closed={q.optional == null}
                   reply={replies[k]}
-                  radio={q.max === 1}
+                  radio={q.max === 1 && q.choices?.length > 1}
                   validated={validated}
                 />
               ))}
@@ -220,7 +220,30 @@ function Survey(props) {
 }
 
 function Question(props) {
-  const openedType = (
+  return (
+    <Form.Group className="my-4 mb-3">
+      <Form.Row>
+        <Col>
+          <Form.Label as="h4" className="text-wrap">
+            {props.id + 1}. {props.text}
+          </Form.Label>
+        </Col>
+        <QuestionInfo
+          className="ml-auto"
+          {...props}
+          optional={props.optional}
+          warning={props.reply?.text?.length > 200}
+          char={props.reply?.text?.length}
+        />
+      </Form.Row>
+      {props.closed ? <MultipleChoice {...props} /> : <OpenHanded {...props} />}
+      <hr />
+    </Form.Group>
+  );
+}
+
+function OpenHanded(props) {
+  return (
     <Row className="pt-2">
       <Col>
         <Form.Control
@@ -246,12 +269,23 @@ function Question(props) {
       </Col>
     </Row>
   );
+}
 
-  const closedType = (
+function MultipleChoice(props) {
+  return (
     <Row className="pt-2">
       <Col>
         {props.choices?.map((text, k) => (
-          <Row key={k} className="pb-2">
+          <Row
+            key={k}
+            className="pb-2"
+            // NOTE clear radio buttons on double click
+            onDoubleClick={() =>
+              props.radio
+                ? props.changeCheck(false, props.id, k, props.radio)
+                : null
+            }
+          >
             <Col sm={5}>
               <Form.Check
                 custom
@@ -265,7 +299,7 @@ function Question(props) {
                   !props.reply?.isInvalid &&
                   props.reply?.isInvalid !== null
                 }
-                defaultChecked={props.reply?.choices[k]}
+                checked={props.reply?.choices[k] || false}
                 label={text}
                 onChange={() =>
                   props.changeCheck(
@@ -287,29 +321,6 @@ function Question(props) {
         )}
       </Col>
     </Row>
-  );
-
-  return (
-    <Form.Group className="my-4 mb-3">
-      <Form.Row>
-        <Col>
-          <Form.Label as="h4" className="text-wrap">
-            {props.id + 1}. {props.text}
-          </Form.Label>
-        </Col>
-        {/* <Col > */}
-        <QuestionInfo
-          className="ml-auto"
-          {...props}
-          optional={props.optional}
-          warning={props.reply?.text?.length > 200}
-          char={props.reply?.text?.length}
-        />
-        {/* </Col> */}
-      </Form.Row>
-      {props.closed ? closedType : openedType}
-      <hr />
-    </Form.Group>
   );
 }
 

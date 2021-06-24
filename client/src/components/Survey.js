@@ -249,7 +249,7 @@ function OpenEnded(props) {
           readOnly={props.readOnly}
           as="textarea"
           rows={5}
-          placeholder="Enter Your Answer"
+          placeholder={props.readOnly ? "No Answer Given" : "Enter Your Answer"}
           value={props.reply?.text || ""}
           isInvalid={props.reply?.isInvalid && props.validated}
           isValid={

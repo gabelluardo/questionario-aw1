@@ -206,10 +206,10 @@ function Survey(props) {
             </Form>
           </Col>
         </Row>
-
         <Navigation
           {...props}
-          show={props.readOnly && allReplies.length > 1}
+          show={props.readOnly}
+          showNav={props.readOnly && allReplies.length > 1}
           first={position === 0}
           last={position === allReplies.length - 1}
           setPosition={setPosition}
@@ -369,22 +369,35 @@ function ActionButtons(props) {
 
 function Navigation(props) {
   return !props.show ? null : (
-    <Row className="pt-5">
-      {props.first ? null : (
-        <Icon.ArrowReturnLeft
-          size={32}
-          className="icon-action mr-auto"
-          onClick={() => props.setPosition((p) => p - 1)}
-        />
+    <div className="pt-5">
+      <hr />
+
+      {!props.showNav ? null : (
+        <Row className="pt-3">
+          {props.first ? null : (
+            <Icon.ArrowReturnLeft
+              size={32}
+              className="icon-action mr-auto"
+              onClick={() => props.setPosition((p) => p - 1)}
+            />
+          )}
+          {props.last ? null : (
+            <Icon.ArrowReturnRight
+              size={32}
+              className="icon-action ml-auto"
+              onClick={() => props.setPosition((p) => p + 1)}
+            />
+          )}
+        </Row>
       )}
-      {props.last ? null : (
-        <Icon.ArrowReturnRight
+      <Row className={props.showNav ? "pt-3" : "pt-5"}>
+        <Icon.House
           size={32}
-          className="icon-action ml-auto"
-          onClick={() => props.setPosition((p) => p + 1)}
+          className="icon-action mx-auto"
+          onClick={() => props.history.push("/")}
         />
-      )}
-    </Row>
+      </Row>
+    </div>
   );
 }
 

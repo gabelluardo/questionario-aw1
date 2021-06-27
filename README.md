@@ -390,8 +390,6 @@ _fields with `*` are the primary keys_
 
 ## Screenshot
 
-<!-- TODO add screenshot -->
-
 ![Screenshot](./img/screenshot.jpg)
 
 ## Users Credentials

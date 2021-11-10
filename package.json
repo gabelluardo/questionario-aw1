@@ -1,0 +1,21 @@
+{
+  "name": "questionario-aw1",
+  "version": "1.0.0",
+  "description": "Exam project for Applicazioni Web I course of Politecnico di Torino",
+  "author": "Gabriele Belluardo <gabelluardo>",
+  "license": "MIT",
+  "homepage": "https://github.com/gabelluardo/questionario-aw1#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gabelluardo/questionario-aw1.git"
+  },
+  "engines": {
+    "node": "14.x",
+    "npm": "8.x"
+  },
+  "scripts": {
+    "heroku-postbuild": "npm -C client i  && npm -C client run build && npm -C server i",
+    "start": "cd server && node server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

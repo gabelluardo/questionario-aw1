@@ -5,16 +5,16 @@ For running it must be used two terminal windows:
 - Client
 
 ```sh
-cd client
-npm i && npm start
+npm -C client i  && npm -C client run start
 ```
 
 - Server
 
 ```sh
-cd server
-npm i && npm start
+npm -C server i && npm -C server run
 ```
+
+All credentials are in the [info](./INFO.md) file
 
 # License
 

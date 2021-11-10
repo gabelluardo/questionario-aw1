@@ -42,11 +42,15 @@ passport.deserializeUser((id, done) => {
 });
 
 // init express
-const port = 3001;
+const port = process.env.PORT || 3001;
 const app = new express();
 
 app.use(morgan("dev"));
 app.use(express.json());
+
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static("../client/build"));
+}
 
 // session middleware
 const isLoggedIn = (req, res, next) => {
